@@ -1,0 +1,61 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+@import "tailwindcss";
+*{
+  font-family: "Outfit", sans-serif;
+}
+::-webkit-scrollbar{
+
+  display: none;
+}
+@theme{
+  --color-primary:#5044E5;
+}
+
+
+/* index.css or globals.css */
+.blog-description h1 {
+  @apply text-4xl font-bold text-gray-900 mb-6;
+}
+
+.blog-description h2 {
+  @apply text-2xl font-semibold text-gray-800 mt-8 mb-4;
+}
+
+.blog-description h3 {
+  @apply text-xl font-medium text-gray-700 mt-6 mb-3;
+}
+
+.blog-description p {
+  @apply text-base leading-7 text-gray-600 mb-5;
+}
+
+.blog-description strong {
+  @apply font-semibold text-gray-900;
+}
+
+.blog-description ul {
+  @apply list-disc pl-6 mb-5;
+}
+
+.blog-description ol {
+  @apply list-decimal pl-6 mb-5;
+}
+
+.blog-description li {
+  @apply mb-2;
+}
+
+.blog-description blockquote {
+  @apply border-l-4 border-primary/60 pl-4 italic text-gray-600 mb-6;
+}
+
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-in-out forwards;
+}

@@ -13,7 +13,7 @@ await connectDB();
 // Middlewares
 app.use(
   cors({
-    origin: ["https://echoblogs-seven.vercel.app/"], // replace with your frontend URL
+    origin: ["https://echoblogs-seven.vercel.app"], // replace with your frontend URL
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })

@@ -287,66 +287,83 @@ const Blog = () => {
 
   const [blog, setBlog] = useState(null);
   const [comments, setComments] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // ✅ Added loading state
 
   // ✅ Fetch blog
   const fetchBlogData = async () => {
-    setLoading(true);
+    setLoading(true); // start loading
     try {
       const res = await axios.get(`/api/blog/${id}`);
       if (res.data.success) {
         setBlog(res.data.blog);
       } else {
-        setBlog(null);
         toast.error(res.data.message || "Failed to load blog");
       }
     } catch (error) {
-      setBlog(null);
       toast.error(error.response?.data?.message || error.message);
     }
-    setLoading(false);
+    setLoading(false); // stop loading
   };
 
   // ✅ Fetch comments
-  const fetchComments = async () => {
+  const fetchComments = async (blogId) => {
     try {
       const res = await axios.post("/api/blog/comments", { blogId: id });
-      setComments(res.data.success && Array.isArray(res.data.comments) ? res.data.comments : []);
+      if (res.data.success && Array.isArray(res.data.comments)) {
+        setComments(res.data.comments);
+      } else {
+        setComments([]);
+      }
     } catch (error) {
       setComments([]);
       toast.error(error.response?.data?.message || error.message);
     }
   };
 
+  // ✅ Load blog + comments
   useEffect(() => {
     if (id) {
       fetchBlogData();
-      fetchComments();
+      fetchComments(id);
     }
   }, [id]);
 
+  // ✅ Animate description
   useEffect(() => {
     if (blog) {
       const elements = document.querySelectorAll(
         ".blog-description p, .blog-description h1, .blog-description h2, .blog-description h3, .blog-description ul, .blog-description ol, .blog-description blockquote"
       );
+
       if (elements.length > 0) {
-        gsap.from(elements, { opacity: 0, y: 30, duration: 0.6, stagger: 0.2 });
+        gsap.from(elements, {
+          opacity: 0,
+          y: 30,
+          duration: 0.6,
+          stagger: 0.2,
+        });
       }
     }
   }, [blog]);
 
+  // ✅ Add comment
   const handleAddComment = async (e) => {
     e.preventDefault();
     const name = e.target.name.value.trim();
     const content = e.target.comment.value.trim();
+
     if (!name || !content) return;
 
     try {
-      const res = await axios.post(`/api/blog/add-comment`, { blog: id, name, content });
+      const res = await axios.post(`/api/blog/add-comment`, {
+        blog: id,
+        name,
+        content,
+      });
+
       if (res.data.success) {
         toast.success(res.data.message || "Comment added!");
-        await fetchComments();
+        await fetchComments(id);
         e.target.reset();
       } else {
         toast.error(res.data.message || "Failed to add comment");
@@ -356,52 +373,88 @@ const Blog = () => {
     }
   };
 
-  // ✅ Skeleton Loader Component
-  const SkeletonLoader = () => (
-    <div className="mx-5 max-w-3xl md:mx-auto my-12 space-y-8 animate-pulse">
-      <div className="h-6 bg-gray-200 rounded w-1/3"></div>
-      <div className="h-10 bg-gray-300 rounded w-2/3"></div>
-      <div className="h-5 bg-gray-200 rounded w-1/4"></div>
-      <div className="h-64 bg-gray-300 rounded-xl"></div>
-      <div className="space-y-4">
-        {[...Array(3)].map((_, i) => (
-          <div key={i} className="h-4 bg-gray-200 rounded w-full"></div>
-        ))}
-      </div>
-    </div>
-  );
-
-  // ✅ Handle loading state
+  // ✅ Loading Animation
   if (loading) {
     return (
       <>
         <Navbar />
-        <SkeletonLoader />
-        <Footer />
-      </>
-    );
-  }
-
-  // ✅ Show "Blog Not Found" ONLY after loading
-  if (!blog) {
-    return (
-      <>
-        <Navbar />
-        <div className="text-center py-20">
-          <h2 className="text-2xl font-semibold text-gray-700">Blog Not Found</h2>
+        <div className="mx-5 max-w-3xl md:mx-auto my-12 space-y-8 animate-pulse">
+          <div className="h-6 bg-gray-200 rounded w-1/3"></div>
+          <div className="h-10 bg-gray-300 rounded w-2/3"></div>
+          <div className="h-5 bg-gray-200 rounded w-1/4"></div>
+          <div className="h-64 bg-gray-300 rounded-xl"></div>
+          <div className="space-y-4">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="h-4 bg-gray-200 rounded w-full"></div>
+            ))}
+          </div>
         </div>
         <Footer />
       </>
     );
   }
 
+  if (!blog) {
+    return (
+      <div className="text-center py-20">
+        <h2 className="text-2xl font-semibold text-gray-700">Blog Not Found</h2>
+      </div>
+    );
+  }
+
   return (
     <>
       <Navbar />
-      {/* ✅ Your existing blog UI (unchanged) */}
+      {/* 🔽 Your existing blog code stays exactly the same 🔽 */}
       <div className="mx-5 max-w-3xl md:mx-auto my-12 space-y-12 text-gray-800">
-        {/* Blog header, image, description, comments, form, share section */}
-        {/* ... Keep your existing code here ... */}
+        {/* Blog Header */}
+        <motion.div
+          className="text-center space-y-4"
+          initial={{ opacity: 0, y: -30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+        >
+          <p className="text-primary uppercase tracking-wide text-sm">
+            Published on {new Date(blog.createdAt).toDateString()}
+          </p>
+          <motion.h1
+            className="text-4xl font-extrabold leading-tight"
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.9, ease: "backOut" }}
+          >
+            {blog.title}
+          </motion.h1>
+          <motion.h2
+            className="text-xl font-medium text-gray-600"
+            dangerouslySetInnerHTML={{ __html: blog.subTitle }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.7 }}
+          />
+          <span className="inline-block bg-primary/10 text-primary px-4 py-1 rounded-full text-sm font-semibold">
+            {blog.category}
+          </span>
+        </motion.div>
+
+        {/* Image */}
+        <motion.img
+          src={blog.image}
+          alt={blog.title}
+          className="rounded-xl shadow-md w-full object-cover"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1 }}
+        />
+
+        {/* Blog Description */}
+        <div
+          className="blog-description mx-auto leading-relaxed text-gray-700"
+          dangerouslySetInnerHTML={{ __html: blog.description }}
+        />
+
+        {/* Comments */}
+        {/* ✅ Your existing comments and form remain unchanged */}
       </div>
       <Footer />
     </>

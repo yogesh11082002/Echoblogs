@@ -149,30 +149,36 @@
 //   );
 // };
 // export default UserDashboard;
-
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useUser, useAuth } from "@clerk/clerk-react";
 
 const UserDashboard = () => {
   const { user, isSignedIn } = useUser();
-  const { getToken } = useAuth(); // ✅ getToken is here
+  const { getToken } = useAuth();
   const [blogs, setBlogs] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchBlogs = async () => {
-      if (!isSignedIn || !user) return;
+      if (!isSignedIn || !user) {
+        setLoading(false);
+        return;
+      }
 
       try {
         const token = await getToken({ template: "default" });
 
         const res = await axios.get("/api/blog/my-blogs", {
-          headers: { Authorization: `Bearer ${token}` }, // ✅ use Bearer
+          headers: { Authorization: `Bearer ${token}` },
         });
 
-        setBlogs(res.data || []);
+        // ✅ Adjust depending on your backend response
+        setBlogs(res.data.blogs || []);
       } catch (err) {
         console.error("Error fetching user blogs:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -206,20 +212,26 @@ const UserDashboard = () => {
       {/* Recent Blogs */}
       <div className="bg-white shadow rounded p-4">
         <h3 className="text-lg font-semibold mb-4">Recent Blogs</h3>
-        {blogs.length === 0 && <p className="text-gray-500">No blogs yet.</p>}
-        <ul>
-          {blogs.slice(0, 5).map((blog) => (
-            <li
-              key={blog._id}
-              className="mb-2 border-b last:border-none pb-2 text-gray-700"
-            >
-              <span className="font-medium">{blog.title}</span> —{" "}
-              <span className="text-gray-500">
-                {blog.published ? "Published" : "Draft"}
-              </span>
-            </li>
-          ))}
-        </ul>
+
+        {loading ? (
+          <p className="text-gray-500">Loading blogs...</p>
+        ) : blogs.length === 0 ? (
+          <p className="text-gray-500">No blogs yet.</p>
+        ) : (
+          <ul>
+            {blogs.slice(0, 5).map((blog) => (
+              <li
+                key={blog._id}
+                className="mb-2 border-b last:border-none pb-2 text-gray-700"
+              >
+                <span className="font-medium">{blog.title}</span> —{" "}
+                <span className="text-gray-500">
+                  {blog.published ? "Published" : "Draft"}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   );

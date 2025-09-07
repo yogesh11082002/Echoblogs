@@ -611,7 +611,7 @@ const { isSignedIn } = useUser();
   };
 
   // ✅ Generate AI content
- const generateContent = async () => {
+ const generateContentHandler = async () => {
      if (!title) {
        toast.error("Please enter a blog title first");
        return;

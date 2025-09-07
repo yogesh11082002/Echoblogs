@@ -1,98 +1,3 @@
-// import React, { useEffect, useRef } from "react";
-// import { assets } from "../assets/assets";
-// import { motion } from "framer-motion";
-// import gsap from "gsap";
-// import { useAppContext } from "../context/AppContext";
-// import { SignedIn, SignedOut, SignInButton, useUser } from "@clerk/clerk-react";
-// import { useNavigate } from "react-router-dom";
-
-// const Navbar = () => {
-//   const { navigate } = useAppContext();
-//   const navRef = useRef(null);
-//   const logoRef = useRef(null);
-//   const buttonRef = useRef(null);
-//   const { isSignedIn, user } = useUser(); // Clerk user
-//   const router = useNavigate();
-
-//   // GSAP entrance animation for Navbar elements
-//   useEffect(() => {
-//     gsap.from([logoRef.current, buttonRef.current], {
-//       y: -50,
-//       opacity: 0,
-//       duration: 1,
-//       stagger: 0.2,
-//       ease: "power3.out",
-//     });
-//   }, []);
-
-//   // Redirect user to dashboard after login
-//   useEffect(() => {
-//     if (isSignedIn && user) {
-//       const adminEmails = ["yogesh@gmail.com"];
-//       if (!adminEmails.includes(user.primaryEmailAddress?.emailAddress)) {
-//         router("/dashboard"); // normal users go to dashboard
-//       }
-//     }
-//   }, [isSignedIn, user, router]);
-
-//   return (
-//     <motion.div
-//       ref={navRef}
-//       className="flex justify-between items-center py-5 px-4 sm:px-20 xl:px-32 -mt-[25px] sm:-mt-[35px] w-full"
-//       initial={{ opacity: 0, y: -20 }}
-//       animate={{ opacity: 1, y: 0 }}
-//       transition={{ duration: 0.8 }}
-//     >
-//       {/* Logo */}
-//       <motion.img
-//         ref={logoRef}
-//         onClick={() => navigate("/")}
-//         src={assets.mylogo}
-//         alt="logo"
-//         className="w-40 sm:w-44 cursor-pointer"
-//         whileHover={{ scale: 1.05 }}
-//         whileTap={{ scale: 0.95 }}
-//       />
-
-//       {/* Login / Dashboard Button */}
-//       <motion.div ref={buttonRef}>
-//         <SignedOut>
-//           <SignInButton mode="modal">
-//             <motion.button
-//               className="flex items-center gap-2 rounded-full text-sm cursor-pointer bg-primary text-white px-10 py-2.5"
-//               whileHover={{ scale: 1.05 }}
-//               whileTap={{ scale: 0.95 }}
-//             >
-//               Login
-//               <motion.img
-//                 src={assets.arrow}
-//                 alt="arrow"
-//                 className="w-3"
-//                 whileHover={{ x: 5 }}
-//                 transition={{ type: "spring", stiffness: 300 }}
-//               />
-//             </motion.button>
-//           </SignInButton>
-//         </SignedOut>
-
-//         <SignedIn>
-//           {/* User avatar + dropdown; safely handle missing profile image */}
-//           <div className="flex items-center gap-2 cursor-pointer" onClick={() => router("/dashboard")}>
-//             <img
-//               src={user?.profileImageUrl || assets.defaultAvatar} // fallback avatar
-//               alt="user avatar"
-//               className="w-8 h-8 rounded-full"
-//             />
-//             <span className="hidden sm:inline">{user?.firstName || "User"}</span>
-//           </div>
-//         </SignedIn>
-//       </motion.div>
-//     </motion.div>
-//   );
-// };
-
-// export default Navbar;
-
 // import React, { useEffect, useRef, useState } from "react";
 // import { assets } from "../assets/assets";
 // import { useNavigate } from "react-router-dom";
@@ -111,9 +16,8 @@
 //   const navigate = useNavigate();
 //   const navRef = useRef(null);
 //   const [scrolled, setScrolled] = useState(false);
-//   const { user, isSignedIn } = useUser();
-
-//   const adminEmails = ["yogesh@gmail.com"];
+//   const { user, isSignedIn, isLoaded } = useUser();
+//   const [redirected, setRedirected] = useState(false);
 
 //   // Animate on mount
 //   useEffect(() => {
@@ -131,6 +35,14 @@
 //     window.addEventListener("scroll", handleScroll);
 //     return () => window.removeEventListener("scroll", handleScroll);
 //   }, []);
+
+//   // Redirect only once after login
+//   useEffect(() => {
+//     if (isLoaded && isSignedIn && user && !redirected) {
+//       setRedirected(true);
+//       navigate("/dashboard"); // all logged-in users go to dashboard
+//     }
+//   }, [isLoaded, isSignedIn, user, navigate, redirected]);
 
 //   return (
 //     <motion.div
@@ -169,17 +81,9 @@
 //           </SignInButton>
 //         </SignedOut>
 
-//         {/* Signed In → Show Dashboard & UserButton */}
+//         {/* Signed In → Show UserButton */}
 //         <SignedIn>
-//           {isSignedIn && user && (
-//             <>
-//                   adminEmails.includes(user.primaryEmailAddress?.emailAddress)
-//                     ? navigate("/admin")
-//                     : navigate("/dashboard")
-                
-//               <UserButton />
-//             </>
-//           )}
+//           <UserButton />
 //         </SignedIn>
 //       </div>
 //     </motion.div>
@@ -226,11 +130,15 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Redirect only once after login
+  // Redirect to dashboard only once after login
   useEffect(() => {
     if (isLoaded && isSignedIn && user && !redirected) {
-      setRedirected(true);
-      navigate("/dashboard"); // all logged-in users go to dashboard
+      const hasVisited = sessionStorage.getItem("hasVisitedDashboard");
+      if (!hasVisited) {
+        sessionStorage.setItem("hasVisitedDashboard", "true");
+        setRedirected(true);
+        navigate("/dashboard");
+      }
     }
   }, [isLoaded, isSignedIn, user, navigate, redirected]);
 
@@ -248,7 +156,7 @@ const Navbar = () => {
     >
       {/* Logo */}
       <motion.img
-        onClick={() => navigate("/")}
+        onClick={() => navigate("/")} // ✅ Always go home
         src={assets.mylogo}
         alt="logo"
         className="w-32 sm:w-40 cursor-pointer"

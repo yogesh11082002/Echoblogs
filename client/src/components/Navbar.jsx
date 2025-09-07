@@ -78,7 +78,7 @@ const Navbar = () => {
   const navRef = useRef(null);
   const logoRef = useRef(null);
   const buttonRef = useRef(null);
-  const { user } = useUser(); // Clerk user
+  const { isSignedIn, user } = useUser(); // Clerk user
   const router = useNavigate();
 
   // GSAP entrance animation for Navbar elements
@@ -94,15 +94,13 @@ const Navbar = () => {
 
   // Redirect user to dashboard after login
   useEffect(() => {
-    if (user) {
-      // If you want to differentiate admin from normal users
-      // Assume admin email is fixed for now
-      const adminEmails = ["yogesh@gmail.com"]; 
-      if (!adminEmails.includes(user.primaryEmailAddress.emailAddress)) {
+    if (isSignedIn && user) {
+      const adminEmails = ["yogesh@gmail.com"];
+      if (!adminEmails.includes(user.primaryEmailAddress?.emailAddress)) {
         router("/dashboard"); // normal users go to dashboard
       }
     }
-  }, [user, router]);
+  }, [isSignedIn, user, router]);
 
   return (
     <motion.div
@@ -145,15 +143,14 @@ const Navbar = () => {
         </SignedOut>
 
         <SignedIn>
-          {/* User avatar + dropdown; clicking it shows logout */}
-          <div className="flex items-center gap-2">
+          {/* User avatar + dropdown; safely handle missing profile image */}
+          <div className="flex items-center gap-2 cursor-pointer" onClick={() => router("/dashboard")}>
             <img
-              src={user.profileImageUrl}
+              src={user?.profileImageUrl || assets.defaultAvatar} // fallback avatar
               alt="user avatar"
-              className="w-8 h-8 rounded-full cursor-pointer"
-              onClick={() => router("/dashboard")}
+              className="w-8 h-8 rounded-full"
             />
-            <span className="hidden sm:inline">{user.firstName}</span>
+            <span className="hidden sm:inline">{user?.firstName || "User"}</span>
           </div>
         </SignedIn>
       </motion.div>

@@ -15,6 +15,7 @@
 
 // export default router;
 import express from "express";
+import upload from "../middleware/multer.js";
 import { userAuth } from "../middleware/userAuth.js";
 import {
   getMyBlogs,
@@ -27,7 +28,7 @@ const userRouter = express.Router();
 
 // Blogs
 userRouter.get("/blog/my-blogs", userAuth, getMyBlogs);
-userRouter.post("/blog", userAuth, createBlog);
+userRouter.post("/blog", upload.single("image"),userAuth, createBlog);
 userRouter.delete("/blog/:id", userAuth, deleteBlog);
 
 // Comments

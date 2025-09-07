@@ -520,6 +520,7 @@
 // };
 
 // export default UserAddBlog;
+
 import React, { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import gsap from "gsap";
@@ -611,32 +612,32 @@ const { isSignedIn } = useUser();
 
   // ✅ Generate AI content
   const generateContentHandler = async () => {
-    if (!title) {
-      toast.error("Please enter a blog title first");
-      return;
-    }
-    try {
-      setIsGenerating(true);
-      const token = await fetchToken();
+  if (!title) {
+    toast.error("Please enter a blog title first");
+    return;
+  }
 
-      const prompt = `Write a detailed blog on the topic: "${title}" including headings, lists, and conclusion.`;
-      const { data } = await axios.post("/api/blog/generate", { prompt }, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+  try {
+    setIsGenerating(true);
 
-      if (data.success && data.content) {
-        setContent(data.content);
-        toast.success("Blog content generated!");
-      } else {
-        toast.error(data.message || "Failed to generate content");
-      }
-    } catch (err) {
-      console.error("AI generation error:", err);
-      toast.error(err.message || "Error generating content");
-    } finally {
-      setIsGenerating(false);
+    const prompt = `Write a detailed blog on the topic: "${title}" including headings, lists, and conclusion.`;
+
+    const { data } = await axios.post("/api/blog/generate", { prompt }); // no headers
+
+    if (data.success && data.content) {
+      setContent(data.content);
+      toast.success("Blog content generated!");
+    } else {
+      toast.error(data.message || "Failed to generate content");
     }
-  };
+  } catch (err) {
+    console.error("AI generation error:", err);
+    toast.error(err.message || "Error generating content");
+  } finally {
+    setIsGenerating(false);
+  }
+};
+
 
   return (
     <form ref={formRef} onSubmit={onSubmitHandler} className="flex-1 bg-blue-50/50 text-gray-600 h-full overflow-scroll p-4">

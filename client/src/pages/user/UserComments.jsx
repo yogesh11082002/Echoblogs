@@ -68,7 +68,7 @@ const UserComments = () => {
       }
 
       try {
-        const token = await getToken({ template: "default" });
+        const token = await getToken();
 
         const res = await axios.get("/api/comments/my-blogs", {
           headers: { Authorization: `Bearer ${token}` },

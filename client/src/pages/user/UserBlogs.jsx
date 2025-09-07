@@ -130,7 +130,7 @@ const UserBlogs = () => {
 
   const deleteBlog = async (id) => {
     try {
-      const token = await getToken({ template: "default" });
+      const token = await getToken();
 
       await axios.delete(`/api/blog/${id}`, {
         headers: { Authorization: `Bearer ${token}` }, // ✅ Fixed

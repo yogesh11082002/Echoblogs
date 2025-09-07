@@ -351,7 +351,7 @@ const UserAddBlog = () => {
     try {
       setIsGenerating(true);
 
-      const token = await getToken({ template: "default" });
+      const token = await getToken();
 
       const prompt = `
 Write a detailed blog on the topic: "${title}".

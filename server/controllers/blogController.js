@@ -205,7 +205,7 @@ export const deleteBlog = async (req, res) => {
 
 
 
-// Get comments on blogs authored by logged-in user
+// Get comments on blog authored by logged-in user
 export const getCommentsOnMyBlogs = async (req, res) => {
   try {
     // find all blogs authored by user

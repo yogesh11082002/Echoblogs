@@ -520,7 +520,6 @@
 // };
 
 // export default UserAddBlog;
-
 import React, { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import gsap from "gsap";
@@ -533,20 +532,20 @@ import { toast } from "react-hot-toast";
 
 const UserAddBlog = () => {
   const { axios } = useAppContext();
-  const { getToken } = useUser();
+  const { getToken, isSignedIn } = useUser();
 
   const [isAdding, setIsAdding] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-
   const [image, setImage] = useState(null);
   const [title, setTitle] = useState("");
   const [subTitle, setSubTitle] = useState("");
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState("Select Category");
   const [isPublished, setIsPublished] = useState(false);
   const [content, setContent] = useState("");
 
   const formRef = useRef(null);
 
+  // GSAP animation
   useEffect(() => {
     if (formRef.current) {
       gsap.from(formRef.current, {
@@ -558,8 +557,12 @@ const UserAddBlog = () => {
     }
   }, []);
 
-  // ✅ Helper to safely get Clerk token
-  const getUserToken = async () => {
+  // ✅ Helper: get token safely
+  const fetchToken = async () => {
+    if (!isSignedIn) {
+      toast.error("Please sign in to continue");
+      throw new Error("User not signed in");
+    }
     try {
       const token = await getToken();
       if (!token) throw new Error("No token returned");
@@ -567,19 +570,17 @@ const UserAddBlog = () => {
     } catch (err) {
       console.error("Token error:", err);
       toast.error("Authentication failed");
-      return null;
+      throw err;
     }
   };
 
   // ✅ Submit blog
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-    if (!category) return toast.error("Please select a category");
-
     try {
       setIsAdding(true);
-      const token = await getUserToken();
-      if (!token) return;
+
+      const token = await fetchToken();
 
       const blog = { title, subTitle, description: content, category, isPublished };
 
@@ -597,7 +598,7 @@ const UserAddBlog = () => {
         setTitle("");
         setSubTitle("");
         setContent("");
-        setCategory("");
+        setCategory("Select Category");
         setIsPublished(false);
       } else {
         toast.error(data.message || "Failed to add blog");
@@ -611,13 +612,15 @@ const UserAddBlog = () => {
   };
 
   // ✅ Generate AI blog content
-  const generateContent = async () => {
-    if (!title) return toast.error("Please enter a blog title first");
+  const generateContentHandler = async () => {
+    if (!title) {
+      toast.error("Please enter a blog title first");
+      return;
+    }
 
     try {
       setIsGenerating(true);
-      const token = await getUserToken();
-      if (!token) return;
+      const token = await fetchToken();
 
       const prompt = `
 Write a detailed blog on the topic: "${title}".
@@ -635,12 +638,18 @@ Write a detailed blog on the topic: "${title}".
       );
 
       if (data.success && data.content) {
-        const cleaned = data.content
-          .replace(/<\s*\/?\s*(html|head|body|title|meta)[^>]*>/gi, "")
+        const cleanedContent = data.content
+          .replace(/<\s*html[^>]*>/gi, "")
+          .replace(/<\s*\/\s*html>/gi, "")
+          .replace(/<\s*head[^>]*>.*?<\s*\/\s*head>/gis, "")
+          .replace(/<\s*body[^>]*>/gi, "")
+          .replace(/<\s*\/\s*body>/gi, "")
+          .replace(/<\s*meta[^>]*>/gi, "")
+          .replace(/<\s*title[^>]*>.*?<\s*\/\s*title>/gis, "")
           .replace(/\n\s*\n/g, "\n")
           .trim();
 
-        setContent(cleaned);
+        setContent(cleanedContent);
         toast.success("Blog content generated!");
       } else {
         toast.error(data.message || "Failed to generate content");
@@ -654,16 +663,11 @@ Write a detailed blog on the topic: "${title}".
   };
 
   return (
-    <form
-      ref={formRef}
-      onSubmit={onSubmitHandler}
-      className="flex-1 bg-blue-50/50 text-gray-600 h-full overflow-scroll p-4"
-    >
-      {/* ...rest of your JSX unchanged... */}
-      { <div className="bg-white w-full max-w-3xl p-6 md:p-10 sm:m-10 shadow rounded space-y-6">
-       {/* Thumbnail */}
-       <div>
-         <p className="font-semibold mb-2">Upload thumbnail</p>
+    <form ref={formRef} onSubmit={onSubmitHandler} className="flex-1 bg-blue-50/50 text-gray-600 h-full overflow-scroll p-4">
+      <div className="bg-white w-full max-w-3xl p-6 md:p-10 sm:m-10 shadow rounded space-y-6">
+        {/* Thumbnail */}
+        <div>
+          <p className="font-semibold mb-2">Upload thumbnail</p>
           <label htmlFor="image">
             <img
               alt="thumbnail"
@@ -689,8 +693,8 @@ Write a detailed blog on the topic: "${title}".
               required
               className="w-full max-w-lg mt-1 p-2 border border-gray-300 outline-none rounded"
               type="text"
-              onChange={(e) => setTitle(e.target.value)}
               value={title}
+              onChange={(e) => setTitle(e.target.value)}
             />
           </div>
           <div>
@@ -700,8 +704,8 @@ Write a detailed blog on the topic: "${title}".
               required
               className="w-full max-w-lg mt-1 p-2 border border-gray-300 outline-none rounded"
               type="text"
-              onChange={(e) => setSubTitle(e.target.value)}
               value={subTitle}
+              onChange={(e) => setSubTitle(e.target.value)}
             />
           </div>
         </div>
@@ -710,25 +714,16 @@ Write a detailed blog on the topic: "${title}".
         <div className="space-y-2 relative">
           <p className="font-semibold mb-1">Blog Description</p>
           <div className="max-w-lg h-80 pb-16 pt-2 relative border border-gray-300 rounded">
-            <ReactQuill
-              value={content}
-              onChange={setContent}
-              theme="snow"
-              className="h-full"
-            />
-
+            <ReactQuill value={content} onChange={setContent} theme="snow" className="h-full" />
             {isGenerating && (
               <div className="absolute inset-0 bg-black/30 flex flex-col items-center justify-center z-10 rounded">
                 <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin mb-4"></div>
-                <p className="text-white font-semibold text-sm animate-pulse">
-                  AI is writing your blog...
-                </p>
+                <p className="text-white font-semibold text-sm animate-pulse">AI is writing your blog...</p>
               </div>
             )}
-
             <button
               type="button"
-              onClick={generateContent}
+              onClick={generateContentHandler}
               disabled={isGenerating}
               className="absolute bottom-2 right-2 text-xs text-white bg-black/70 px-4 py-1.5 rounded cursor-pointer"
             >
@@ -741,7 +736,6 @@ Write a detailed blog on the topic: "${title}".
         <div className="space-y-2 mt-12">
           <p className="font-semibold mb-1">Blog category</p>
           <select
-            name="category"
             className="mt-1 px-3 py-2 border text-gray-500 border-gray-300 outline-none rounded w-48"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
@@ -775,7 +769,7 @@ Write a detailed blog on the topic: "${title}".
         >
           {isAdding ? "Adding..." : "Add Blog"}
         </motion.button>
-      </div> }
+      </div>
     </form>
   );
 };

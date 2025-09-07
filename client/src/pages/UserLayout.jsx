@@ -102,18 +102,13 @@
 // };
 
 // export default UserLayout;
-
-import { NavLink, Outlet } from "react-router-dom";
-import { assets } from "../assets/assets"; // adjust path
+ import { NavLink, Outlet } from "react-router-dom";
+import { assets } from "../assets/assets";
 import Navbar from "../components/Navbar";
 
 const UserSidebar = () => {
   return (
-      <>
-        
-        {/* Add Navbar */}
-        <Navbar/>
-    <div className="flex flex-col border-r border-gray-200 min-h-full pt-6 w-64 bg-white">
+    <div className="flex flex-col border-r border-gray-200 min-h-screen w-64 bg-white pt-6">
       <NavLink
         end
         to="/dashboard"
@@ -164,19 +159,23 @@ const UserSidebar = () => {
         <span>Comments</span>
       </NavLink>
     </div>
-    </>
   );
 };
 
 const UserLayout = () => {
   return (
-    <div className="flex h-screen bg-gray-50">
-      <UserSidebar />
-      <div className="flex-1 p-5 overflow-auto">
-        <Outlet />
+    <div className="flex flex-col h-screen bg-gray-50">
+      {/* Navbar at the top */}
+      <Navbar />
+
+      {/* Body: sidebar + main content */}
+      <div className="flex flex-1 pt-24"> {/* pt-24 = navbar height spacing */}
+        <UserSidebar />
+        <div className="flex-1 p-5 overflow-auto">
+          <Outlet />
+        </div>
       </div>
     </div>
-    
   );
 };
 

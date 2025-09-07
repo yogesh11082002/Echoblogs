@@ -153,7 +153,7 @@ export const createBlog = async (req, res) => {
       subTitle,
       description,
       category,
-      published,
+      isPublished,
       author: req.user,
     });
 

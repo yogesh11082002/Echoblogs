@@ -36,6 +36,7 @@ import cors from "cors";
 import connectDB from "./configs/db.js";
 import adminRouter from "./routes/adminRoutes.js";
 import blogRouter from "./routes/blogRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 
 const app = express();
 
@@ -57,6 +58,7 @@ app.use(express.json());
 app.get("/", (req, res) => res.send("API is working"));
 app.use("/api/admin", adminRouter);
 app.use("/api/blog", blogRouter);
+app.use("/api", userRoutes);
 
 // ❌ Remove app.listen() — not needed for Vercel
 // ✅ Just export the app

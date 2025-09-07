@@ -133,6 +133,66 @@ export const generateContent = async (req, res) => {
 
 
 
+// Get all blogs by logged-in user
+export const getMyBlogs = async (req, res) => {
+  try {
+    const blogs = await Blog.find({ author: req.user }).sort({ createdAt: -1 });
+    res.json(blogs);
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Create new blog
+export const createBlog = async (req, res) => {
+  try {
+    const { title, subTitle, description, category, published } = req.body;
+
+    const newBlog = await Blog.create({
+      title,
+      subTitle,
+      description,
+      category,
+      published,
+      author: req.user,
+    });
+
+    res.json({ success: true, blog: newBlog });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Delete blog (only if logged-in user is the author)
+export const deleteBlog = async (req, res) => {
+  try {
+    const blog = await Blog.findOne({ _id: req.params.id, author: req.user });
+    if (!blog) return res.status(404).json({ success: false, message: "Blog not found" });
+
+    await Blog.deleteOne({ _id: blog._id });
+    res.json({ success: true, message: "Blog deleted" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 
 
+
+// Get comments on blogs authored by logged-in user
+export const getCommentsOnMyBlogs = async (req, res) => {
+  try {
+    // find all blogs authored by user
+    const myBlogs = await Blog.find({ author: req.user }).select("_id");
+
+    const blogIds = myBlogs.map((b) => b._id);
+
+    const comments = await Comment.find({ blog: { $in: blogIds } })
+      .populate("blog", "title")
+      .sort({ createdAt: -1 });
+
+    res.json(comments);
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 

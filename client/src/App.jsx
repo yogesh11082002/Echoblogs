@@ -97,10 +97,10 @@ const App = () => {
           path="/dashboard"
           element={<SignedIn>{user && <UserLayout />}</SignedIn>}
         >
-          <Route index element={<UserDashboard />} />   {/* ✅ now uses separate component */}
+          {/* <Route index element={<UserDashboard />} />   {/* ✅ now uses separate component */}
           <Route path="blogs" element={<ListBlog />} />
           <Route path="addBlog" element={<AddBlog />} />
-          <Route path="comments" element={<Comments />} />
+          <Route path="comments" element={<Comments />} /> 
         </Route>
       </Routes>
     </div>

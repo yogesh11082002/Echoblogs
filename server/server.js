@@ -46,7 +46,7 @@ await connectDB();
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin) return callback(null, true); // allow Postman / mobile apps
+      if (!origin) return callback(null, true); 
       if (origin === "https://echoblog-yogesh.vercel.app") return callback(null, true);
       callback(new Error("Not allowed by CORS"));
     },

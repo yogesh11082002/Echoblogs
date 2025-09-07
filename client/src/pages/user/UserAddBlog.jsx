@@ -527,12 +527,15 @@ import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
 import { assets } from "../../assets/assets";
 import { useAppContext } from "../../context/AppContext";
-import { useUser } from "@clerk/clerk-react";
+import { useAuth, useUser } from "@clerk/clerk-react";
 import { toast } from "react-hot-toast";
 
 const UserAddBlog = () => {
   const { axios } = useAppContext();
-  const { getToken, isSignedIn } = useUser(); // ✅ make sure getToken exists
+  
+const { getToken } = useAuth();
+const { isSignedIn } = useUser();
+ // ✅ make sure getToken exists
 
   const [isAdding, setIsAdding] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);

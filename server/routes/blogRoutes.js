@@ -13,5 +13,17 @@ blogRouter.post("/toggle-publish", auth ,togglePublish);
 blogRouter.post("/add-comment", addComment);
 blogRouter.post("/comments", getBlogComments);
 blogRouter.post("/generate",  auth, generateContent);
+blogRouter.get("/my-blogs", userAuth, async (req, res) => {
+  try {
+    const userId = req.userId;
+    const blogs = await BlogModel.find({ author: userId }).sort({ createdAt: -1 });
+    res.json(blogs);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Failed to fetch user blogs" });
+  }
+});
+
+
 
 export default blogRouter;

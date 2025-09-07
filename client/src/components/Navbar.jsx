@@ -206,10 +206,8 @@ const Navbar = () => {
   const navigate = useNavigate();
   const navRef = useRef(null);
   const [scrolled, setScrolled] = useState(false);
-  const { user, isSignedIn, isLoaded } = useUser(); // isLoaded ensures Clerk finished loading
+  const { user, isSignedIn, isLoaded } = useUser();
   const [redirected, setRedirected] = useState(false);
-
-  const adminEmails = ["yogesh@gmail.com"];
 
   // Animate on mount
   useEffect(() => {
@@ -231,12 +229,8 @@ const Navbar = () => {
   // Redirect only once after login
   useEffect(() => {
     if (isLoaded && isSignedIn && user && !redirected) {
-      setRedirected(true); // prevent multiple redirects
-      if (adminEmails.includes(user.primaryEmailAddress?.emailAddress)) {
-        navigate("/admin");
-      } else {
-        navigate("/dashboard");
-      }
+      setRedirected(true);
+      navigate("/dashboard"); // all logged-in users go to dashboard
     }
   }, [isLoaded, isSignedIn, user, navigate, redirected]);
 

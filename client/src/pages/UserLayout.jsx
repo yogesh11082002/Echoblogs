@@ -1,120 +1,17 @@
-// // import { NavLink, Outlet, useNavigate } from "react-router-dom";
-// // import { assets } from "../assets/assets"; // adjust path
-// // import { useAppContext } from "../context/AppContext";
-// // import { useClerk } from "@clerk/clerk-react"; // 👈 import Clerk
-
-// // const UserSidebar = () => {
-// //   return (
-// //     <div className="flex flex-col border-r border-gray-200 min-h-full pt-6">
-// //         <NavLink end={true} to='/dashboard' className={({isActive})=>`flex items-center gap-3 py-3.5 px-3  md:px-9 md:min-w-64 cursor-pointer ${isActive && 'bg-primary/10 border-r-4 border-primary'}`}>
-// //                 <img src={assets.home_icon} alt=""  className='min-w-4 w-5'/>
-// //                 <p className='hidden md:inline-block'>Dashboard</p>
-// //               </NavLink>
-// //       <NavLink
-// //         end={true}
-// //         to="/dashboard/blogs"
-// //         className={({ isActive }) =>
-// //           `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-64 cursor-pointer ${
-// //             isActive && "bg-primary/10 border-r-4 border-primary"
-// //           }`
-// //         }
-// //       >
-// //         <img src={assets.home_icon} alt="" className="min-w-4 w-5" />
-// //         <p className="hidden md:inline-block">My Blogs</p>
-// //       </NavLink>
-
-// //       <NavLink
-// //         to="/dashboard/addBlog"
-// //         className={({ isActive }) =>
-// //           `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-64 cursor-pointer ${
-// //             isActive && "bg-primary/10 border-r-4 border-primary"
-// //           }`
-// //         }
-// //       >
-// //         <img src={assets.add_icon} alt="" className="min-w-4 w-5" />
-// //         <p className="hidden md:inline-block">Add Blog</p>
-// //       </NavLink>
-
-// //       <NavLink
-// //         to="/dashboard/comments"
-// //         className={({ isActive }) =>
-// //           `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-64 cursor-pointer ${
-// //             isActive && "bg-primary/10 border-r-4 border-primary"
-// //           }`
-// //         }
-// //       >
-// //         <img src={assets.comment_icon} alt="" className="min-w-4 w-5" />
-// //         <p className="hidden md:inline-block">Comments</p>
-// //       </NavLink>
-// //     </div>
-// //   );
-// // };
-
-// // const UserLayout = () => {
-// //   const { setToken, setUser } = useAppContext();
-// //   const navigate = useNavigate();
-// //   const { signOut } = useClerk(); // 👈 Clerk signOut function
-
-// //   const logout = async () => {
-// //     try {
-// //       // Logout from Clerk
-// //       await signOut();
-
-// //       // Clear local token and context
-// //       localStorage.removeItem("token");
-// //       if (setToken) setToken(null);
-// //       if (setUser) setUser(null);
-
-// //       // Redirect to home page
-// //       navigate("/");
-// //     } catch (err) {
-// //       console.error("Logout failed:", err);
-// //     }
-// //   };
-
-// //   return (
-// //     <div className="flex flex-col min-h-screen">
-// //       {/* Header */}
-// //       <div className="flex items-center justify-between py-2 h-[70px] px-4 sm:px-12 border-b border-gray-200">
-// //         <img
-// //           onClick={() => navigate("/")}
-// //           src={assets.mylogo}
-// //           alt="logo"
-// //           className="w-40 cursor-pointer"
-// //         />
-// //         <button
-// //           onClick={logout}
-// //           className="text-sm px-8 py-2 bg-primary text-white rounded-full cursor-pointer"
-// //         >
-// //           Logout
-// //         </button>
-// //       </div>
-
-// //       {/* Body */}
-// //       <div className="flex h-[calc(100vh-70px)]">
-// //         <UserSidebar />
-// //         <div className="flex-1 p-5 overflow-auto">
-// //           <Outlet />
-// //         </div>
-// //       </div>
-// //     </div>
-// //   );
-// // };
-
-// // export default UserLayout;
-//  import { NavLink, Outlet } from "react-router-dom";
+// import { NavLink, Outlet, useNavigate } from "react-router-dom";
 // import { assets } from "../assets/assets";
-// import Navbar from "../components/Navbar";
+// import { useAppContext } from "../context/AppContext";
+// import { useClerk } from "@clerk/clerk-react";
 
 // const UserSidebar = () => {
 //   return (
-//     <div className="flex flex-col border-r border-gray-200 min-h-screen w-64 bg-white pt-6">
+//     <div className="flex flex-col border-r border-gray-200 min-h-full w-64 bg-white pt-6">
 //       <NavLink
 //         end
 //         to="/dashboard"
 //         className={({ isActive }) =>
 //           `flex items-center gap-3 py-3.5 px-4 cursor-pointer ${
-//             isActive && "bg-primary/10 border-r-4 border-primary"
+//             isActive ? "bg-primary/10 border-r-4 border-primary" : ""
 //           }`
 //         }
 //       >
@@ -127,7 +24,7 @@
 //         to="/dashboard/blogs"
 //         className={({ isActive }) =>
 //           `flex items-center gap-3 py-3.5 px-4 cursor-pointer ${
-//             isActive && "bg-primary/10 border-r-4 border-primary"
+//             isActive ? "bg-primary/10 border-r-4 border-primary" : ""
 //           }`
 //         }
 //       >
@@ -139,7 +36,7 @@
 //         to="/dashboard/addBlog"
 //         className={({ isActive }) =>
 //           `flex items-center gap-3 py-3.5 px-4 cursor-pointer ${
-//             isActive && "bg-primary/10 border-r-4 border-primary"
+//             isActive ? "bg-primary/10 border-r-4 border-primary" : ""
 //           }`
 //         }
 //       >
@@ -151,7 +48,7 @@
 //         to="/dashboard/comments"
 //         className={({ isActive }) =>
 //           `flex items-center gap-3 py-3.5 px-4 cursor-pointer ${
-//             isActive && "bg-primary/10 border-r-4 border-primary"
+//             isActive ? "bg-primary/10 border-r-4 border-primary" : ""
 //           }`
 //         }
 //       >
@@ -163,17 +60,46 @@
 // };
 
 // const UserLayout = () => {
-//   return (
-//     <div className="flex flex-col h-screen bg-gray-50">
-//       {/* Navbar at the top */}
-//       <Navbar />
+//   const { setToken, setUser } = useAppContext();
+//   const { signOut } = useClerk();
+//   const navigate = useNavigate();
 
-//       {/* Body: sidebar + main content */}
-//       <div className="flex flex-1 pt-24"> {/* pt-24 = navbar height spacing */}
+//   const logout = async () => {
+//     try {
+//       await signOut();
+//       localStorage.removeItem("token");
+//       if (setToken) setToken(null);
+//       if (setUser) setUser(null);
+//       navigate("/");
+//     } catch (err) {
+//       console.error("Logout failed:", err);
+//     }
+//   };
+
+//   return (
+//     <div className="flex flex-col min-h-screen bg-gray-50">
+//       {/* Header */}
+//       <header className="flex items-center justify-between px-6 py-3 border-b bg-white shadow-sm">
+//         <img
+//           onClick={() => navigate("/")}
+//           src={assets.mylogo}
+//           alt="logo"
+//           className="w-32 sm:w-40 cursor-pointer"
+//         />
+//         <button
+//           onClick={logout}
+//           className="px-4 py-2 bg-primary text-white rounded-full hover:bg-primary/90"
+//         >
+//           Logout
+//         </button>
+//       </header>
+
+//       {/* Sidebar + Main Content */}
+//       <div className="flex flex-1">
 //         <UserSidebar />
-//         <div className="flex-1 p-5 overflow-auto">
+//         <main className="flex-1 p-5 overflow-auto">
 //           <Outlet />
-//         </div>
+//         </main>
 //       </div>
 //     </div>
 //   );
@@ -181,14 +107,13 @@
 
 // export default UserLayout;
 
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { NavLink, Outlet } from "react-router-dom";
 import { assets } from "../assets/assets";
-import { useAppContext } from "../context/AppContext";
-import { useClerk } from "@clerk/clerk-react";
+import Navbar from "../components/Navbar";
 
 const UserSidebar = () => {
   return (
-    <div className="flex flex-col border-r border-gray-200 min-h-full w-64 bg-white pt-6">
+    <div className="flex flex-col border-r border-gray-200 min-h-screen w-64 bg-white pt-6">
       <NavLink
         end
         to="/dashboard"
@@ -203,7 +128,6 @@ const UserSidebar = () => {
       </NavLink>
 
       <NavLink
-        end
         to="/dashboard/blogs"
         className={({ isActive }) =>
           `flex items-center gap-3 py-3.5 px-4 cursor-pointer ${
@@ -243,46 +167,17 @@ const UserSidebar = () => {
 };
 
 const UserLayout = () => {
-  const { setToken, setUser } = useAppContext();
-  const { signOut } = useClerk();
-  const navigate = useNavigate();
-
-  const logout = async () => {
-    try {
-      await signOut();
-      localStorage.removeItem("token");
-      if (setToken) setToken(null);
-      if (setUser) setUser(null);
-      navigate("/");
-    } catch (err) {
-      console.error("Logout failed:", err);
-    }
-  };
-
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="flex items-center justify-between px-6 py-3 border-b bg-white shadow-sm">
-        <img
-          onClick={() => navigate("/")}
-          src={assets.mylogo}
-          alt="logo"
-          className="w-32 sm:w-40 cursor-pointer"
-        />
-        <button
-          onClick={logout}
-          className="px-4 py-2 bg-primary text-white rounded-full hover:bg-primary/90"
-        >
-          Logout
-        </button>
-      </header>
+    <div className="flex flex-col h-screen bg-gray-50">
+      {/* Top Navbar */}
+      <Navbar />
 
-      {/* Sidebar + Main Content */}
-      <div className="flex flex-1">
+      {/* Sidebar + Content */}
+      <div className="flex flex-1 pt-24">
         <UserSidebar />
-        <main className="flex-1 p-5 overflow-auto">
-          <Outlet />
-        </main>
+        <div className="flex-1 p-5 overflow-auto">
+          <Outlet /> {/* ✅ Active page will render here */}
+        </div>
       </div>
     </div>
   );

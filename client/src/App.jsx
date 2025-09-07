@@ -105,9 +105,14 @@ const App = () => {
 
         {/* User dashboard */}
         <Route
-          path="/dashboard"
-          element={<SignedIn>{user && <UserLayout />}</SignedIn>}
-        >
+  path="/dashboard/*"
+  element={
+    <SignedIn>
+      <UserLayout />
+    </SignedIn>
+  }
+>
+
           <Route index element={<UserDashboard />} />
           <Route path="blogs" element={<UserBlogs />} />
           <Route path="addBlog" element={<UserAddBlog />} />

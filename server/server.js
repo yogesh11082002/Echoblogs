@@ -31,39 +31,22 @@
 // export default app;
 
 import express from "express";
-import "dotenv/config";
 import cors from "cors";
-import connectDB from "./configs/db.js";
-import adminRouter from "./routes/adminRoutes.js";
-import blogRouter from "./routes/blogRoutes.js";
 
 const app = express();
 
-// Connect to DB
-await connectDB();
-
-// Middleware
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin) return callback(null, true); 
-      if (origin === "https://echoblog-yogesh.vercel.app") return callback(null, true);
-      callback(new Error("Not allowed by CORS"));
-    },
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
-  })
-);
+// Allow requests from your frontend
+app.use(cors({
+  origin: "https://echoblog-yogesh.vercel.app",  // your frontend URL
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
 
 app.use(express.json());
 
-// Routes
-app.get("/", (req, res) => res.send("API is working"));
-
-// Admin routes (JWT protected)
-app.use("/api/admin", adminRouter);
-
-// Blog routes
+// Your routes
 app.use("/api/blog", blogRouter);
 
-export default app;
+app.listen(process.env.PORT || 3000, () => {
+  console.log("Server running...");
+});

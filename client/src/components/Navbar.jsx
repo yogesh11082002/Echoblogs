@@ -64,7 +64,7 @@
 
 // export default Navbar;
 
-"use client";
+
 import React, { useEffect, useRef } from "react";
 import { assets } from "../assets/assets";
 import { motion } from "framer-motion";

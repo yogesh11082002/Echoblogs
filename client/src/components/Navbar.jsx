@@ -91,27 +91,24 @@
 // };
 
 // export default Navbar;
-
 import React, { useEffect, useRef, useState } from "react";
 import { assets } from "../assets/assets";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import {
   SignedIn,
   SignedOut,
   SignInButton,
   UserButton,
-  useUser,
 } from "@clerk/clerk-react";
 import { motion } from "framer-motion";
 import gsap from "gsap";
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const location = useLocation(); // ✅ Get current route
   const navRef = useRef(null);
   const [scrolled, setScrolled] = useState(false);
-  const { user, isSignedIn, isLoaded } = useUser();
-  const [redirected, setRedirected] = useState(false);
 
   // Animate on mount
   useEffect(() => {
@@ -129,18 +126,6 @@ const Navbar = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  // Redirect to dashboard only once after login
-  useEffect(() => {
-    if (isLoaded && isSignedIn && user && !redirected) {
-      const hasVisited = sessionStorage.getItem("hasVisitedDashboard");
-      if (!hasVisited) {
-        sessionStorage.setItem("hasVisitedDashboard", "true");
-        setRedirected(true);
-        navigate("/dashboard");
-      }
-    }
-  }, [isLoaded, isSignedIn, user, navigate, redirected]);
 
   return (
     <motion.div
@@ -179,8 +164,21 @@ const Navbar = () => {
           </SignInButton>
         </SignedOut>
 
-        {/* Signed In → Show UserButton */}
+        {/* Signed In → Show Dashboard Button + UserButton */}
         <SignedIn>
+          {/* ✅ Show Dashboard button only if NOT on /dashboard */}
+          {location.pathname !== "/dashboard" && (
+            <motion.button
+              onClick={() => navigate("/dashboard")}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="rounded-full text-sm cursor-pointer bg-primary text-white px-5 py-2.5"
+            >
+              Dashboard
+            </motion.button>
+          )}
+
+          {/* User Profile */}
           <UserButton />
         </SignedIn>
       </div>

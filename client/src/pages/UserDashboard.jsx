@@ -53,7 +53,7 @@ const UserDashboard = () => {
         const token = await getToken({ template: "default" });
 
         // Call backend user route (make sure backend has /api/blog/my-blogs using userAuth middleware)
-        const res = await axios.get("/api/blog/my-blogs", {
+        const res = await axios.get("/api/blog/all", {
           headers: {
             Authorization: token, // raw Clerk token
           },

@@ -635,7 +635,7 @@ Write a detailed blog on the topic: "${title}".
     const { data } = await axios.post("/api/blog/generate", { prompt }); // no auth needed
 
     if (data.success && data.content) {
-      // Clean HTML content
+      // Clean HTML content here
       const cleanedContent = data.content
         .replace(/<\s*html[^>]*>/gi, "")
         .replace(/<\s*\/\s*html>/gi, "")

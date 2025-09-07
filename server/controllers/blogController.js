@@ -135,11 +135,11 @@ export const generateContent = async (req, res) => {
 
 // Get all blogs by logged-in user
 export const getMyBlogs = async (req, res) => {
-  try {
-    const blogs = await Blog.find({ author: req.user }).sort({ createdAt: -1 });
-    res.json(blogs);
+   try {
+    const blogs = await Blog.find({ isPublished: true });
+    res.json({ success: true, blogs });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.json({ success: false, message: error.message });
   }
 };
 

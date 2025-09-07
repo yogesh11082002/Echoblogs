@@ -611,32 +611,53 @@ const { isSignedIn } = useUser();
   };
 
   // ✅ Generate AI content
-  const generateContentHandler = async () => {
-  if (!title) {
-    toast.error("Please enter a blog title first");
-    return;
-  }
-
-  try {
-    setIsGenerating(true);
-
-    const prompt = `Write a detailed blog on the topic: "${title}" including headings, lists, and conclusion.`;
-
-    const { data } = await axios.post("/api/blog/generate", { prompt }); // no headers
-
-    if (data.success && data.content) {
-      setContent(data.content);
-      toast.success("Blog content generated!");
-    } else {
-      toast.error(data.message || "Failed to generate content");
-    }
-  } catch (err) {
-    console.error("AI generation error:", err);
-    toast.error(err.message || "Error generating content");
-  } finally {
-    setIsGenerating(false);
-  }
-};
+ const generateContent = async () => {
+     if (!title) {
+       toast.error("Please enter a blog title first");
+       return;
+     }
+ 
+     try {
+       setIsGenerating(true);
+ 
+       const prompt = `
+ Write a detailed blog on the topic: "${title}".
+ - Include an introduction paragraph.
+ - Use bold headings and subheadings (<h1>, <h2>, <h3>) for sections.
+ - Include lists (<ul><li>) for steps, tips, and examples.
+ - Include tips or examples in italic or bold where appropriate.
+ - Use clear, simple language.
+ - End with a conclusion.
+ - Do NOT include outer <html>, <body>, or metadata tags.
+ - Output clean HTML suitable for ReactQuill with correct heading and list formatting.
+       `;
+ 
+       const { data } = await axios.post("/api/blog/generate", { prompt });
+ 
+       if (data.success) {
+         let cleanedContent = data.content
+           .replace(/<\s*html[^>]*>/gi, "")
+           .replace(/<\s*\/\s*html>/gi, "")
+           .replace(/<\s*head[^>]*>.*?<\s*\/\s*head>/gis, "")
+           .replace(/<\s*body[^>]*>/gi, "")
+           .replace(/<\s*\/\s*body>/gi, "")
+           .replace(/<\s*meta[^>]*>/gi, "")
+           .replace(/<\s*title[^>]*>.*?<\s*\/\s*title>/gis, "")
+           .replace(/\n\s*\n/g, "\n")
+           .trim();
+ 
+         setContent(cleanedContent);
+         toast.success("Blog content generated successfully!");
+       } else {
+         toast.error(data.message || "Failed to generate blog content");
+       }
+     } catch (error) {
+       console.error("AI generation error:", error);
+       toast.error(error.message || "Error generating blog content");
+     } finally {
+       setIsGenerating(false);
+     }
+   };
 
 
   return (

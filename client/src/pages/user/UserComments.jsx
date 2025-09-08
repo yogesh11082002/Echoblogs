@@ -59,7 +59,7 @@
 import React, { useState, useEffect } from "react";
 import { useUser, useAuth } from "@clerk/clerk-react";
 import { toast } from "react-hot-toast";
-import UserCommentTableItem from "../../components/user/UserCommentTableItem"; // ✅ Row component like CommentTableItem
+import UserCommentTableItem from "./UserCommentTableItem"; // ✅ Row component like CommentTableItem
 import { useAppContext } from "../../context/AppContext";
 
 const UserComments = ({ refreshTrigger }) => {

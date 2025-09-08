@@ -135,13 +135,14 @@ export const generateContent = async (req, res) => {
 
 // Get all blogs by logged-in user
 export const getMyBlogs = async (req, res) => {
-   try {
-    const blogs = await Blog.find({ isPublished: true });
+  try {
+    const blogs = await Blog.find({ author: req.user }).sort({ createdAt: -1 });
     res.json({ success: true, blogs });
   } catch (error) {
     res.json({ success: false, message: error.message });
   }
 };
+
 
 // Create new blog
 export const createBlog = async (req, res) => {
@@ -208,18 +209,17 @@ export const deleteBlog = async (req, res) => {
 // Get comments on blog authored by logged-in user
 export const getCommentsOnMyBlogs = async (req, res) => {
   try {
-    // find all blogs authored by user
     const myBlogs = await Blog.find({ author: req.user }).select("_id");
-
     const blogIds = myBlogs.map((b) => b._id);
 
     const comments = await Comment.find({ blog: { $in: blogIds } })
       .populate("blog", "title")
       .sort({ createdAt: -1 });
 
-    res.json(comments);
+    res.json({ success: true, comments });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
 

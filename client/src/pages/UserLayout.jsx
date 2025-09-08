@@ -52,8 +52,10 @@
 
 // export default UserLayout;
 
-import { NavLink } from "react-router-dom";
+import React from "react";
+import { NavLink, Outlet } from "react-router-dom";
 import { assets } from "../assets/assets";
+import Navbar from "../components/Navbar";
 
 const UserSidebar = () => {
   const navItems = [
@@ -86,4 +88,21 @@ const UserSidebar = () => {
   );
 };
 
-export default UserSidebar;
+const UserLayout = () => {
+  return (
+    <div className="flex flex-col h-screen bg-gray-50">
+      {/* Top Navbar */}
+      <Navbar />
+
+      {/* Sidebar + Content */}
+      <div className="flex flex-1 pt-24">
+        <UserSidebar />
+        <div className="flex-1 p-5 overflow-auto">
+          <Outlet /> {/* Active page will render here */}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default UserLayout;

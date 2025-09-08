@@ -119,7 +119,7 @@ import { useUser, useAuth } from "@clerk/clerk-react";
 import { toast } from "react-hot-toast";
 
 const UserComments = ({ refreshTrigger }) => {
-  const { user, isSignedIn } = useUser();
+  const { isSignedIn } = useUser();
   const { getToken } = useAuth();
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -129,12 +129,15 @@ const UserComments = ({ refreshTrigger }) => {
       setLoading(false);
       return;
     }
+
     try {
       const token = await getToken();
-      const res = await axios.get("/api/blog/my-comments", {
+      const res = await axios.get("/api/user/comments/my-blogs", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setComments(res.data.comments || []);
+
+      if (res.data.success) setComments(res.data.comments);
+      else toast.error(res.data.message || "Failed to fetch comments");
     } catch (err) {
       console.error(err);
       toast.error("Failed to fetch comments");
@@ -143,18 +146,22 @@ const UserComments = ({ refreshTrigger }) => {
     }
   };
 
-  useEffect(() => { fetchComments(); }, [refreshTrigger, isSignedIn]);
+  useEffect(() => {
+    fetchComments();
+  }, [refreshTrigger, isSignedIn]);
 
   if (loading) return <p>Loading comments...</p>;
   if (!comments.length) return <p>No comments yet.</p>;
 
   return (
     <div className="space-y-2">
-      {comments.map(c => (
+      {comments.map((c) => (
         <div key={c._id} className="border p-2 rounded bg-gray-50">
           <p className="font-semibold">{c.name}</p>
           <p>{c.content}</p>
-          <p className="text-sm text-gray-500">Blog: {c.blog?.title || "Deleted"}</p>
+          <p className="text-sm text-gray-500">
+            Blog: {c.blog?.title || "Deleted"}
+          </p>
         </div>
       ))}
     </div>
@@ -162,3 +169,4 @@ const UserComments = ({ refreshTrigger }) => {
 };
 
 export default UserComments;
+

@@ -210,7 +210,7 @@ import { Pencil, Trash2 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
 const UserBlogs = ({ refreshTrigger }) => {
-  const { user, isSignedIn } = useUser();
+  const { isSignedIn } = useUser();
   const { getToken } = useAuth();
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -220,12 +220,15 @@ const UserBlogs = ({ refreshTrigger }) => {
       setLoading(false);
       return;
     }
+
     try {
       const token = await getToken();
-      const res = await axios.get("/api/blog/my-blogs", {
+      const res = await axios.get("/api/user/blog/my-blogs", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setBlogs(res.data.blogs || []);
+
+      if (res.data.success) setBlogs(res.data.blogs);
+      else toast.error(res.data.message || "Failed to fetch blogs");
     } catch (err) {
       console.error(err);
       toast.error("Failed to fetch blogs");
@@ -237,7 +240,7 @@ const UserBlogs = ({ refreshTrigger }) => {
   const deleteBlog = async (id) => {
     try {
       const token = await getToken();
-      await axios.delete(`/api/blog/${id}`, {
+      await axios.delete(`/api/user/blog/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       toast.success("Blog deleted");
@@ -248,7 +251,9 @@ const UserBlogs = ({ refreshTrigger }) => {
     }
   };
 
-  useEffect(() => { fetchBlogs(); }, [refreshTrigger, isSignedIn]);
+  useEffect(() => {
+    fetchBlogs();
+  }, [refreshTrigger, isSignedIn]);
 
   if (loading) return <p>Loading blogs...</p>;
   if (!blogs.length) return <p>No blogs yet.</p>;
@@ -268,8 +273,15 @@ const UserBlogs = ({ refreshTrigger }) => {
             <td className="p-2">{b.title}</td>
             <td className="p-2">{b.isPublished ? "Published" : "Draft"}</td>
             <td className="p-2 flex gap-2">
-              <button className="text-blue-600 flex items-center gap-1"><Pencil size={16}/> Edit</button>
-              <button onClick={() => deleteBlog(b._id)} className="text-red-600 flex items-center gap-1"><Trash2 size={16}/> Delete</button>
+              <button className="text-blue-600 flex items-center gap-1">
+                <Pencil size={16} /> Edit
+              </button>
+              <button
+                onClick={() => deleteBlog(b._id)}
+                className="text-red-600 flex items-center gap-1"
+              >
+                <Trash2 size={16} /> Delete
+              </button>
             </td>
           </tr>
         ))}
@@ -279,3 +291,4 @@ const UserBlogs = ({ refreshTrigger }) => {
 };
 
 export default UserBlogs;
+

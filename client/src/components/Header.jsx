@@ -43,7 +43,7 @@ const Header = () => {
   }, []);
 
   return (
-    <div className="mx-8 sm:mx-16 xl:mx-24 relative  mt-100 sm:mt-120">
+    <div className="mx-8 sm:mx-16 xl:mx-24 relative  mt-50">
       <div className="text-center mt-20 mb-8">
         <motion.h1
           ref={headingRef}

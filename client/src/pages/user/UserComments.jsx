@@ -113,63 +113,50 @@
 // };
 
 // export default UserComments;
-
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useUser, useAuth } from "@clerk/clerk-react";   // ✅ useAuth added
+import { useUser, useAuth } from "@clerk/clerk-react";
+import { toast } from "react-hot-toast";
 
-const UserComments = () => {
+const UserComments = ({ refreshTrigger }) => {
   const { user, isSignedIn } = useUser();
-  const { getToken } = useAuth();   // ✅ fix
+  const { getToken } = useAuth();
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchComments = async () => {
-      if (!isSignedIn || !user) {
-        setLoading(false);
-        return;
-      }
+  const fetchComments = async () => {
+    if (!isSignedIn) {
+      setLoading(false);
+      return;
+    }
+    try {
+      const token = await getToken();
+      const res = await axios.get("/api/blog/my-comments", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setComments(res.data.comments || []);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to fetch comments");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-      try {
-        const token = await getToken();
+  useEffect(() => { fetchComments(); }, [refreshTrigger, isSignedIn]);
 
-        const res = await axios.get("/api/blog/my-comments", {   // ✅ correct endpoint
-          headers: { Authorization: `Bearer ${token}` },
-          withCredentials: true,
-        });
-
-        setComments(res.data.comments || []);
-      } catch (err) {
-        console.error("Error fetching comments:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchComments();
-  }, [isSignedIn, user]);
+  if (loading) return <p>Loading comments...</p>;
+  if (!comments.length) return <p>No comments yet.</p>;
 
   return (
-    <div>
-      <h2 className="text-2xl font-bold mb-6">Comments on My Blogs</h2>
-      {loading ? (
-        <p className="text-gray-500">Loading comments...</p>
-      ) : comments.length === 0 ? (
-        <p className="text-gray-500">No comments yet.</p>
-      ) : (
-        <div className="space-y-4">
-          {comments.map((c) => (
-            <div key={c._id} className="bg-white shadow rounded p-4">
-              <p className="font-medium">{c.name}</p>
-              <p className="text-gray-600">{c.content}</p>
-              <p className="text-sm text-gray-400">
-                Blog: {c.blog?.title || "Deleted"}
-              </p>
-            </div>
-          ))}
+    <div className="space-y-2">
+      {comments.map(c => (
+        <div key={c._id} className="border p-2 rounded bg-gray-50">
+          <p className="font-semibold">{c.name}</p>
+          <p>{c.content}</p>
+          <p className="text-sm text-gray-500">Blog: {c.blog?.title || "Deleted"}</p>
         </div>
-      )}
+      ))}
     </div>
   );
 };

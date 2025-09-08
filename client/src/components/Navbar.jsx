@@ -157,7 +157,7 @@ const Navbar = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="flex items-center gap-2 rounded-full text-sm cursor-pointer bg-primary text-white px-6 py-2.5"
+              className="flex items-center gap-2 rounded-full text-sm cursor-pointer bg-primary text-white px-6 mr-6 py-2.5"
             >
               login <ArrowRight className="w-4 h-4" />
             </motion.button>

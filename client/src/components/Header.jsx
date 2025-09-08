@@ -81,7 +81,7 @@ const Header = () => {
             onChange={(e) => setInput(e.target.value)}
             className="w-full pl-4 pr-10 outline-none"
             type="text"
-            placeholder="Search for blogs"
+            placeholder="Search for blog"
           />
 
           {/* ✅ Clear Button (only shows when input has text) */}

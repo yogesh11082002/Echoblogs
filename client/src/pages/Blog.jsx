@@ -597,7 +597,7 @@ const Blog = () => {
   return (
     <>
       <Navbar />
-      <div className="mx-5 max-w-3xl md:mx-auto my-12 space-y-12 text-gray-800">
+      <div className="mx-5 max-w-3xl md:mx-auto my-12 mt-20 sm:mt-30 space-y-12 text-gray-800">
         {/* Blog Header */}
         <motion.div
           className="text-center space-y-4"

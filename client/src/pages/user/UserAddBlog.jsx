@@ -438,14 +438,24 @@ const UserAddBlog = ({ onBlogAdded }) => {
       setIsGenerating(true);
       const token = await fetchToken();
 
-      const prompt = `Write a detailed blog on "${title}" in clean HTML suitable for ReactQuill.`;
+      const prompt = `
+Write a detailed blog on the topic: "${title}".
+- Include an introduction paragraph.
+- Use bold headings and subheadings (<h1>, <h2>, <h3>) for sections.
+- Include lists (<ul><li>) for steps, tips, and examples.
+- Include tips or examples in italic or bold where appropriate.
+- Use clear, simple language.
+- End with a conclusion.
+- Do NOT include outer <html>, <body>, or metadata tags.
+- Output clean HTML suitable for ReactQuill with correct heading and list formatting.
+      `;
       const { data } = await axios.post(
         "/api/blog/generate",
         { prompt },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      if (data.success && data.content) {
+      if (data.success) {
         let cleanedContent = data.content
           .replace(/<\s*html[^>]*>/gi, "")
           .replace(/<\s*\/\s*html>/gi, "")

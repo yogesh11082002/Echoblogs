@@ -57,6 +57,7 @@ userRouter.get("/dashboard", userAuth, getUserDashboard);
 userRouter.get("/blog/my-blogs", userAuth, getMyBlogs);
 userRouter.post("/blog", upload.single("image"), userAuth, createBlog);
 userRouter.delete("/blog/:id", userAuth, deleteBlog);
+userRouter.delete("/blog/toggle-publish", userAuth, deleteBlog);
 
 // Comments on User Blogs
 userRouter.get("/comments/my-blogs", userAuth, getCommentsOnMyBlogs);

@@ -60,12 +60,12 @@ const UserBlogTable = ({ blog, fetchBlogs, index }) => {
         return;
       }
 
-      const res = await fetch(`${BASE_URL}/api/user/blog/${id}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+      const res = await fetch(`${BASE_URL}/api/user/blog/${blog._id}`, {
+  method: "DELETE",
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+
         body: JSON.stringify({ id: blog._id }),
       });
 

@@ -132,14 +132,23 @@ export const getUserDashboard = async (req, res) => {
 export const togglePublishBlog = async (req, res) => {
   try {
     const { id } = req.body;
-    const blog = await Blog.findById(id);
+    if (!id) return res.json({ success: false, message: "Blog ID required" });
+
+    const blog = await Blog.findOne({ _id: id, author: req.userId });
+    if (!blog) return res.json({ success: false, message: "Blog not found" });
+
     blog.isPublished = !blog.isPublished;
     await blog.save();
-    res.json({ success: true, message: "Blog status updated" });
+
+    res.json({
+      success: true,
+      message: `Blog ${blog.isPublished ? "Published" : "Unpublished"}`,
+    });
   } catch (error) {
     res.json({ success: false, message: error.message });
   }
 };
+
 
 // export const addUserComment = async (req, res) => {
 //   try {

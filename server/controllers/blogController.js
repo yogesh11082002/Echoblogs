@@ -42,7 +42,7 @@ export const addBlog = async (req, res) => {
       category,
       image,
       isPublished,
-      author: author || "admin",
+      author: "admin",
     });
 
     res.json({ success: true, message: "Blog added successfully" });

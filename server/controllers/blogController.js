@@ -42,7 +42,7 @@ export const addBlog = async (req, res) => {
       category,
       image,
       isPublished,
-      // author: "admin",
+      author: "admin",
     });
 
     res.json({ success: true, message: "Blog added successfully" });
@@ -103,7 +103,7 @@ export const addComment = async (req, res) => {
   try {
     const { blog,name,content } = req.body;
     await Comment.create({blog,name,content, 
-      // author: "admin"
+      author: "admin" || userId ,
     });
    
     res.json({ success: true, message: "Comment added for review" });

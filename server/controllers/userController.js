@@ -56,21 +56,41 @@ export const deleteBlog = async (req, res) => {
 };
 
 // Get all comments on the user's blogs
+// export const getCommentsOnMyBlogs = async (req, res) => {
+//   try {
+//     const userId = req.userId;
+//     const userBlogs = await Blog.find({ author: userId }).select("_id");
+
+//     const blogIds = userBlogs.map(b => b._id);
+//     const comments = await Comment.find({ blog: { $in: blogIds } })
+//       .populate("blog", "title")
+//       .sort({ createdAt: -1 });
+
+//     res.json({ success: true, comments });
+//   } catch (error) {
+//     res.json({ success: false, message: error.message });
+//   }
+// };
 export const getCommentsOnMyBlogs = async (req, res) => {
   try {
     const userId = req.userId;
+
+    // Get all blogs authored by the user
     const userBlogs = await Blog.find({ author: userId }).select("_id");
 
     const blogIds = userBlogs.map(b => b._id);
+
+    // Get all comments on those blogs
     const comments = await Comment.find({ blog: { $in: blogIds } })
-      .populate("blog", "title")
-      .sort({ createdAt: -1 });
+      .populate("blog", "title")   // Populate blog title
+      .sort({ createdAt: -1 });    // Most recent first
 
     res.json({ success: true, comments });
   } catch (error) {
     res.json({ success: false, message: error.message });
   }
 };
+
 
 // Get dashboard stats for the user
 export const getUserDashboard = async (req, res) => {

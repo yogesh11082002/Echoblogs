@@ -102,7 +102,7 @@ export const togglePublish = async (req, res) => {
 export const addComment = async (req, res) => {
   try {
     const { blog,name,content } = req.body;
-    await Comment.create({blog,name,content});
+    await Comment.create({blog,name,content, author: "admin"});
    
     res.json({ success: true, message: "Comment added for review" });
   } catch (error) {

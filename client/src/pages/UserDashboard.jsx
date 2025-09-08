@@ -241,9 +241,10 @@
 
 // export default UserDashboard;
 import React, { useState } from "react";
-import UserAddBlog from "./UserAddBlog";
-import UserBlogs from "./UserBlogs";
-import UserComments from "./UserComments";
+import UserAddBlog from "./user/UserAddBlog";
+import UserBlogs from "./user/UserBlogs";
+import UserComments from "./user/UserComments";
+
 
 const UserDashboard = () => {
   const [refreshTrigger, setRefreshTrigger] = useState(0);

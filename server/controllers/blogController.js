@@ -98,16 +98,37 @@ export const togglePublish = async (req, res) => {
   }
 };
 
+// export const addComment = async (req, res) => {
+//   try {
+//     const { blog,name,content } = req.body;
+//     await Comment.create({blog,name,content});
+   
+//     res.json({ success: true, message: "Comment added for review" });
+//   } catch (error) {
+//     res.json({ success: false, message: error.message });
+//   }
+// };
 export const addComment = async (req, res) => {
   try {
-    const { blog,name,content } = req.body;
-    await Comment.create({blog,name,content});
-   
-    res.json({ success: true, message: "Comment added for review" });
+    const { blog, name, content } = req.body;
+
+    if (!req.user) {
+      return res.status(401).json({ success: false, message: "Not authenticated" });
+    }
+
+    const comment = await Comment.create({
+      blog,
+      name,
+      content,
+      authorId: req.user, // ✅ set the logged-in user ID
+    });
+
+    res.json({ success: true, message: "Comment added for review", comment });
   } catch (error) {
     res.json({ success: false, message: error.message });
   }
 };
+
 
 export const getBlogComments = async (req, res) => {
   try {

@@ -119,7 +119,7 @@ const UserBlogs = () => {
     }
 
     try {
-      const token = await getToken({ template: "default" });
+      const token = await getToken();
 
       const res = await axios.get("/api/blog/my-blogs", {
         headers: { Authorization: `Bearer ${token}` },

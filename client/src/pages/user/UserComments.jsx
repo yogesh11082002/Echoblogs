@@ -50,7 +50,6 @@
 // };
 
 // export default UserComments;
-
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useUser } from "@clerk/clerk-react";
@@ -74,8 +73,7 @@ const UserComments = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        // Adjust depending on your backend response structure
-        setComments(res.data.comments || []);
+        setComments(res.data.comments || []); // ✅ ensure we use comments key
       } catch (err) {
         console.error("Error fetching comments:", err);
       } finally {
@@ -84,7 +82,7 @@ const UserComments = () => {
     };
 
     fetchComments();
-  }, [isSignedIn, user, getToken]);
+  }, [isSignedIn, user]);
 
   return (
     <div>

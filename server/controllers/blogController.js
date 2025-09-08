@@ -145,6 +145,52 @@ export const getMyBlogs = async (req, res) => {
 
 
 // Create new blog
+// export const createBlog = async (req, res) => {
+//   try {
+//     const { title, subTitle, description, category, isPublished } = JSON.parse(
+//       req.body.blog
+//     );
+//     const imageFile = req.file;
+
+//     if (!title || !description || !category || !imageFile) {
+//       return res.json({ success: false, message: " Missing required fields" });
+//     }
+//     const fileBuffer = fs.readFileSync(imageFile.path);
+
+//     const response = await imagekit.upload({
+//       file: fileBuffer,
+//       fileName: imageFile.originalname,
+//       folder: "/blogs",
+//     });
+
+//     // optimize image
+
+//     const optimizedImageUrl = imagekit.url({
+//       path: response.filePath,
+//       transformation: [
+//         { quality: "auto" },
+//         { format: "webp" },
+//         { width: "1280" },
+//       ],
+//     });
+
+//     const image = optimizedImageUrl;
+
+//     await Blog.create({
+//       title,
+//       subTitle,
+//       description,
+//       category,
+//       image,
+//       isPublished,
+//     });
+
+//     res.json({ success: true, message: "Blog added successfully" });
+//   } catch (error) {
+//     res.json({ success: false, message: error.message });
+//   }
+// };
+
 export const createBlog = async (req, res) => {
   try {
     const { title, subTitle, description, category, isPublished } = JSON.parse(
@@ -153,8 +199,9 @@ export const createBlog = async (req, res) => {
     const imageFile = req.file;
 
     if (!title || !description || !category || !imageFile) {
-      return res.json({ success: false, message: " Missing required fields" });
+      return res.json({ success: false, message: "Missing required fields" });
     }
+
     const fileBuffer = fs.readFileSync(imageFile.path);
 
     const response = await imagekit.upload({
@@ -163,29 +210,22 @@ export const createBlog = async (req, res) => {
       folder: "/blogs",
     });
 
-    // optimize image
-
     const optimizedImageUrl = imagekit.url({
       path: response.filePath,
-      transformation: [
-        { quality: "auto" },
-        { format: "webp" },
-        { width: "1280" },
-      ],
+      transformation: [{ quality: "auto" }, { format: "webp" }, { width: "1280" }],
     });
 
-    const image = optimizedImageUrl;
-
-    await Blog.create({
+    const blog = await Blog.create({
       title,
       subTitle,
       description,
       category,
-      image,
+      image: optimizedImageUrl,
       isPublished,
+      author: req.user,   // ✅ track which user created this blog
     });
 
-    res.json({ success: true, message: "Blog added successfully" });
+    res.json({ success: true, message: "Blog added successfully", blog });
   } catch (error) {
     res.json({ success: false, message: error.message });
   }

@@ -102,7 +102,6 @@
 // };
 
 // export default UserBlogs;
-
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useUser } from "@clerk/clerk-react";
@@ -111,20 +110,26 @@ import { Pencil, Trash2 } from "lucide-react";
 const UserBlogs = () => {
   const { user, isSignedIn, getToken } = useUser();
   const [blogs, setBlogs] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const fetchBlogs = async () => {
-    if (!isSignedIn || !user) return;
+    if (!isSignedIn || !user) {
+      setLoading(false);
+      return;
+    }
 
     try {
       const token = await getToken({ template: "default" });
 
       const res = await axios.get("/api/blog/my-blogs", {
-        headers: { Authorization: `Bearer ${token}` }, // ✅ Fixed
+        headers: { Authorization: `Bearer ${token}` },
       });
 
-      setBlogs(res.data || []);
+      setBlogs(res.data.blogs || []); // ✅ use blogs key
     } catch (err) {
       console.error("Error fetching user blogs:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -133,7 +138,7 @@ const UserBlogs = () => {
       const token = await getToken();
 
       await axios.delete(`/api/blog/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }, // ✅ Fixed
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       setBlogs((prev) => prev.filter((b) => b._id !== id));
@@ -144,13 +149,15 @@ const UserBlogs = () => {
 
   useEffect(() => {
     fetchBlogs();
-  }, [isSignedIn, user, getToken]);
+  }, [isSignedIn, user]);
 
   return (
     <div>
       <h2 className="text-2xl font-bold mb-6">My Blogs</h2>
 
-      {blogs.length === 0 ? (
+      {loading ? (
+        <p className="text-gray-500">Loading blogs...</p>
+      ) : blogs.length === 0 ? (
         <p className="text-gray-500">You haven’t created any blogs yet.</p>
       ) : (
         <table className="w-full bg-white shadow rounded overflow-hidden">
@@ -166,7 +173,7 @@ const UserBlogs = () => {
               <tr key={blog._id} className="border-t">
                 <td className="py-3 px-4">{blog.title}</td>
                 <td className="py-3 px-4">
-                  {blog.published ? (
+                  {blog.isPublished ? ( // ✅ fixed field name
                     <span className="text-green-600">Published</span>
                   ) : (
                     <span className="text-yellow-600">Draft</span>

@@ -102,6 +102,7 @@
 // };
 
 // export default UserBlogs;
+
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useUser } from "@clerk/clerk-react";
@@ -121,9 +122,11 @@ const UserBlogs = () => {
     try {
       const token = await getToken();
 
-      const res = await axios.get("/api/blog/my-blogs", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+     const res = await axios.get("/api/blog/my-blogs", {
+  headers: { Authorization: `Bearer ${token}` },
+  withCredentials: true,
+});
+
 
       setBlogs(res.data.blogs || []); // ✅ use blogs key
     } catch (err) {

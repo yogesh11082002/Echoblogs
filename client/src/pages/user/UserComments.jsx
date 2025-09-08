@@ -50,6 +50,7 @@
 // };
 
 // export default UserComments;
+
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useUser } from "@clerk/clerk-react";
@@ -69,9 +70,11 @@ const UserComments = () => {
       try {
         const token = await getToken();
 
-        const res = await axios.get("/api/comments/my-blogs", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+       const res = await axios.get("/api/blog/my-comments", {   // ✅ fixed endpoint
+  headers: { Authorization: `Bearer ${token}` },
+  withCredentials: true,
+});
+
 
         setComments(res.data.comments || []); // ✅ ensure we use comments key
       } catch (err) {

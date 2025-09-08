@@ -1,127 +1,74 @@
 // import React, { useEffect, useState } from "react";
 // import axios from "axios";
-// import { useUser } from "@clerk/clerk-react";
+// import { useUser, useAuth } from "@clerk/clerk-react";
+// import { toast } from "react-hot-toast";
 
-// const UserComments = () => {
-//   const { user, isSignedIn, getToken } = useUser();
-//   const [comments, setComments] = useState([]);
-
-//   useEffect(() => {
-//     const fetchComments = async () => {
-//       if (!isSignedIn || !user) return;
-
-//       try {
-//         const token = await getToken({ template: "default" });
-
-//         const res = await axios.get("/api/comments/my-blogs", {
-//           headers: { Authorization: token },
-//         });
-
-//         setComments(res.data || []);
-//       } catch (err) {
-//         console.error("Error fetching comments:", err);
-//       }
-//     };
-
-//     fetchComments();
-//   }, [isSignedIn, user, getToken]);
-
-//   return (
-//     <div>
-//       <h2 className="text-2xl font-bold mb-6">Comments on My Blogs</h2>
-
-//       {comments.length === 0 ? (
-//         <p className="text-gray-500">No comments yet.</p>
-//       ) : (
-//         <div className="space-y-4">
-//           {comments.map((c) => (
-//             <div key={c._id} className="bg-white shadow rounded p-4">
-//               <p className="font-medium">{c.name}</p>
-//               <p className="text-gray-600">{c.content}</p>
-//               <p className="text-sm text-gray-400">
-//                 Blog: {c.blog?.title || "Deleted"}
-//               </p>
-//             </div>
-//           ))}
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default UserComments;
-
-// import React, { useEffect, useState } from "react";
-// import axios from "axios";
-// import { useUser } from "@clerk/clerk-react";
-
-// const UserComments = () => {
-//   const { user, isSignedIn, getToken } = useUser();
+// const UserComments = ({ refreshTrigger }) => {
+//   const { isSignedIn } = useUser();
+//   const { getToken } = useAuth();
 //   const [comments, setComments] = useState([]);
 //   const [loading, setLoading] = useState(true);
 
+//   const fetchComments = async () => {
+//     if (!isSignedIn) {
+//       setLoading(false);
+//       return;
+//     }
+
+//     try {
+//       const token = await getToken();
+//       const res = await axios.get("/api/user/comments/my-blogs", {
+//         headers: { Authorization: `Bearer ${token}` },
+//       });
+
+//       if (res.data.success) setComments(res.data.comments);
+//       else toast.error(res.data.message || "Failed to fetch comments");
+//     } catch (err) {
+//       console.error(err);
+//       toast.error("Failed to fetch comments");
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
 //   useEffect(() => {
-//     const fetchComments = async () => {
-//       if (!isSignedIn || !user) {
-//         setLoading(false);
-//         return;
-//       }
-
-//       try {
-//         const token = await getToken();
-
-//        const res = await axios.get("/api/blog/my-comments", {   // ✅ fixed endpoint
-//   headers: { Authorization: `Bearer ${token}` },
-//   withCredentials: true,
-// });
-
-
-//         setComments(res.data.comments || []); // ✅ ensure we use comments key
-//       } catch (err) {
-//         console.error("Error fetching comments:", err);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
 //     fetchComments();
-//   }, [isSignedIn, user]);
+//   }, [refreshTrigger, isSignedIn]);
+
+//   if (loading) return <p>Loading comments...</p>;
+//   if (!comments.length) return <p>No comments yet.</p>;
 
 //   return (
-//     <div>
-//       <h2 className="text-2xl font-bold mb-6">Comments on My Blogs</h2>
-
-//       {loading ? (
-//         <p className="text-gray-500">Loading comments...</p>
-//       ) : comments.length === 0 ? (
-//         <p className="text-gray-500">No comments yet.</p>
-//       ) : (
-//         <div className="space-y-4">
-//           {comments.map((c) => (
-//             <div key={c._id} className="bg-white shadow rounded p-4">
-//               <p className="font-medium">{c.name}</p>
-//               <p className="text-gray-600">{c.content}</p>
-//               <p className="text-sm text-gray-400">
-//                 Blog: {c.blog?.title || "Deleted"}
-//               </p>
-//             </div>
-//           ))}
+//     <div className="space-y-2">
+//       {comments.map((c) => (
+//         <div key={c._id} className="border p-2 rounded bg-gray-50">
+//           <p className="font-semibold">{c.name}</p>
+//           <p>{c.content}</p>
+//           <p className="text-sm text-gray-500">
+//             Blog: {c.blog?.title || "Deleted"}
+//           </p>
 //         </div>
-//       )}
+//       ))}
 //     </div>
 //   );
 // };
 
 // export default UserComments;
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+
+
+import React, { useState, useEffect } from "react";
 import { useUser, useAuth } from "@clerk/clerk-react";
 import { toast } from "react-hot-toast";
+import UserCommentTableItem from "../../components/user/UserCommentTableItem"; // ✅ Row component like CommentTableItem
+import { useAppContext } from "../../context/AppContext";
 
 const UserComments = ({ refreshTrigger }) => {
   const { isSignedIn } = useUser();
   const { getToken } = useAuth();
+  const { axios } = useAppContext();
+
   const [comments, setComments] = useState([]);
+  const [filter, setFilter] = useState("Not Approved");
   const [loading, setLoading] = useState(true);
 
   const fetchComments = async () => {
@@ -130,14 +77,18 @@ const UserComments = ({ refreshTrigger }) => {
       return;
     }
 
+    setLoading(true);
     try {
       const token = await getToken();
-      const res = await axios.get("/api/user/comments/my-blogs", {
+      const { data } = await axios.get("/api/user/comments/my-blogs", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      if (res.data.success) setComments(res.data.comments);
-      else toast.error(res.data.message || "Failed to fetch comments");
+      if (data.success) {
+        setComments(data.comments);
+      } else {
+        toast.error(data.message || "Failed to fetch comments");
+      }
     } catch (err) {
       console.error(err);
       toast.error("Failed to fetch comments");
@@ -150,23 +101,79 @@ const UserComments = ({ refreshTrigger }) => {
     fetchComments();
   }, [refreshTrigger, isSignedIn]);
 
-  if (loading) return <p>Loading comments...</p>;
-  if (!comments.length) return <p>No comments yet.</p>;
-
   return (
-    <div className="space-y-2">
-      {comments.map((c) => (
-        <div key={c._id} className="border p-2 rounded bg-gray-50">
-          <p className="font-semibold">{c.name}</p>
-          <p>{c.content}</p>
-          <p className="text-sm text-gray-500">
-            Blog: {c.blog?.title || "Deleted"}
-          </p>
+    <div className="flex-1 pt-5 px-5 sm:pt-12 sm:pl-16 bg-blue-50/50">
+      <div className="flex justify-between items-center max-w-3xl">
+        <h1 className="text-lg font-semibold">My Comments</h1>
+        <div className="flex gap-4">
+          <button
+            onClick={() => setFilter("Approved")}
+            className={`shadow-custom-sm border rounded-full px-4 py-1 cursor-pointer text-xs ${
+              filter === "Approved" ? "text-primary" : "text-gray-700"
+            }`}
+          >
+            Approved
+          </button>
+          <button
+            onClick={() => setFilter("Not Approved")}
+            className={`shadow-custom-sm border rounded-full px-4 py-1 cursor-pointer text-xs ${
+              filter === "Not Approved" ? "text-primary" : "text-gray-700"
+            }`}
+          >
+            Not Approved
+          </button>
         </div>
-      ))}
+      </div>
+
+      <div className="relative h-4/5 mt-4 max-w-3xl overflow-x-auto shadow rounded-lg scrollbar-hide bg-white">
+        <table className="w-full text-sm text-gray-500">
+          <thead className="text-xs text-gray-600 text-left uppercase">
+            <tr>
+              <th scope="col" className="px-6 py-3">
+                Blog & Comment
+              </th>
+              <th scope="col" className="px-6 py-3 max-sm:hidden">
+                Status
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Action
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading ? (
+              <tr>
+                <td colSpan={3} className="text-center py-6">
+                  Loading comments...
+                </td>
+              </tr>
+            ) : comments.length === 0 ? (
+              <tr>
+                <td colSpan={3} className="text-center py-6">
+                  No comments found
+                </td>
+              </tr>
+            ) : (
+              comments
+                .filter((comment) =>
+                  filter === "Approved"
+                    ? comment.isApproved === true
+                    : comment.isApproved === false
+                )
+                .map((comment, index) => (
+                  <UserCommentTableItem
+                    key={comment._id}
+                    comment={comment}
+                    index={index + 1}
+                    fetchComments={fetchComments}
+                  />
+                ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
 
 export default UserComments;
-

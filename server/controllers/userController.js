@@ -150,15 +150,44 @@ export const togglePublishBlog = async (req, res) => {
 };
 
 
-// export const addUserComment = async (req, res) => {
-//   try {
-//     const { blog,name,content } = req.body;
-//     await Comment.create({blog,name,content, 
-//      author: userId,
-//     });
+
+export const addUserComment = async (req, res) => {
+  try {
+    const { blog,name,content } = req.body;
+    await Comment.create({blog,name,content, 
+     author: userId,
+    });
    
-//     res.json({ success: true, message: "Comment added for review" });
-//   } catch (error) {
-//     res.json({ success: false, message: error.message });
-//   }
-// };
+    res.json({ success: true, message: "Comment added for review" });
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
+};
+
+ export const deleteUserCommentById = async (req ,res)=>{
+
+try {
+    const{id}= req.body;
+    await Comment.findByIdAndDelete(id);
+
+res.json({success : true, message:"Comment deleted successfully"})
+
+} catch (error) {
+    res.json({success:false, message:error.message});
+}
+ }
+
+  export const approveUserCommentById = async (req ,res)=>{
+
+try {
+    const{id}= req.body;
+    await Comment.findByIdAndUpdate(id , {isApproved:true});
+
+res.json({success : true, message:"Comment Approved successfully"})
+
+} catch (error) {
+    res.json({success:false, message:error.message});
+}
+ }
+ 
+

@@ -47,6 +47,9 @@ import {
   getCommentsOnMyBlogs,
   getUserDashboard,
   togglePublishBlog,
+  deleteUserCommentById,
+  approveUserCommentById,
+  addUserComment,
 } from "../controllers/userController.js";
 
 const userRouter = express.Router();
@@ -62,5 +65,8 @@ userRouter.post("/blog/toggle-publish", userAuth, togglePublishBlog);
 
 // Comments on User Blogs
 userRouter.get("/comments/my-blogs", userAuth, getCommentsOnMyBlogs);
+userRouter.post("/delete-comment", userAuth, deleteUserCommentById );
+userRouter.post("/approve-comment", userAuth, approveUserCommentById);
+userRouter.post("/add-comment", userAuth, addUserComment);
 
 export default userRouter;

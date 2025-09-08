@@ -103,13 +103,115 @@
 
 // export default UserBlogs;
 
+// import React, { useEffect, useState } from "react";
+// import axios from "axios";
+// import { useUser } from "@clerk/clerk-react";
+// import { Pencil, Trash2 } from "lucide-react";
+
+// const UserBlogs = () => {
+//   const { user, isSignedIn, getToken } = useUser();
+//   const [blogs, setBlogs] = useState([]);
+//   const [loading, setLoading] = useState(true);
+
+//   const fetchBlogs = async () => {
+//     if (!isSignedIn || !user) {
+//       setLoading(false);
+//       return;
+//     }
+
+//     try {
+//       const token = await getToken();
+
+//      const res = await axios.get("/api/blog/my-blogs", {
+//   headers: { Authorization: `Bearer ${token}` },
+//   withCredentials: true,
+// });
+
+
+//       setBlogs(res.data.blogs || []); // ✅ use blogs key
+//     } catch (err) {
+//       console.error("Error fetching user blogs:", err);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   const deleteBlog = async (id) => {
+//     try {
+//       const token = await getToken();
+
+//       await axios.delete(`/api/blog/${id}`, {
+//         headers: { Authorization: `Bearer ${token}` },
+//       });
+
+//       setBlogs((prev) => prev.filter((b) => b._id !== id));
+//     } catch (err) {
+//       console.error("Error deleting blog:", err);
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchBlogs();
+//   }, [isSignedIn, user]);
+
+//   return (
+//     <div>
+//       <h2 className="text-2xl font-bold mb-6">My Blogs</h2>
+
+//       {loading ? (
+//         <p className="text-gray-500">Loading blogs...</p>
+//       ) : blogs.length === 0 ? (
+//         <p className="text-gray-500">You haven’t created any blogs yet.</p>
+//       ) : (
+//         <table className="w-full bg-white shadow rounded overflow-hidden">
+//           <thead className="bg-gray-100">
+//             <tr>
+//               <th className="text-left py-3 px-4">Title</th>
+//               <th className="text-left py-3 px-4">Status</th>
+//               <th className="text-left py-3 px-4">Actions</th>
+//             </tr>
+//           </thead>
+//           <tbody>
+//             {blogs.map((blog) => (
+//               <tr key={blog._id} className="border-t">
+//                 <td className="py-3 px-4">{blog.title}</td>
+//                 <td className="py-3 px-4">
+//                   {blog.isPublished ? ( // ✅ fixed field name
+//                     <span className="text-green-600">Published</span>
+//                   ) : (
+//                     <span className="text-yellow-600">Draft</span>
+//                   )}
+//                 </td>
+//                 <td className="py-3 px-4 flex gap-3">
+//                   <button className="text-blue-600 hover:underline flex items-center gap-1">
+//                     <Pencil size={16} /> Edit
+//                   </button>
+//                   <button
+//                     onClick={() => deleteBlog(blog._id)}
+//                     className="text-red-600 hover:underline flex items-center gap-1"
+//                   >
+//                     <Trash2 size={16} /> Delete
+//                   </button>
+//                 </td>
+//               </tr>
+//             ))}
+//           </tbody>
+//         </table>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default UserBlogs;
+
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useUser } from "@clerk/clerk-react";
+import { useUser, useAuth } from "@clerk/clerk-react";   // ✅ useAuth added
 import { Pencil, Trash2 } from "lucide-react";
 
 const UserBlogs = () => {
-  const { user, isSignedIn, getToken } = useUser();
+  const { user, isSignedIn } = useUser();
+  const { getToken } = useAuth();   // ✅ fix
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -122,13 +224,12 @@ const UserBlogs = () => {
     try {
       const token = await getToken();
 
-     const res = await axios.get("/api/blog/my-blogs", {
-  headers: { Authorization: `Bearer ${token}` },
-  withCredentials: true,
-});
+      const res = await axios.get("/api/blog/my-blogs", {
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
+      });
 
-
-      setBlogs(res.data.blogs || []); // ✅ use blogs key
+      setBlogs(res.data.blogs || []);
     } catch (err) {
       console.error("Error fetching user blogs:", err);
     } finally {
@@ -139,9 +240,9 @@ const UserBlogs = () => {
   const deleteBlog = async (id) => {
     try {
       const token = await getToken();
-
       await axios.delete(`/api/blog/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
       });
 
       setBlogs((prev) => prev.filter((b) => b._id !== id));
@@ -157,7 +258,6 @@ const UserBlogs = () => {
   return (
     <div>
       <h2 className="text-2xl font-bold mb-6">My Blogs</h2>
-
       {loading ? (
         <p className="text-gray-500">Loading blogs...</p>
       ) : blogs.length === 0 ? (
@@ -176,7 +276,7 @@ const UserBlogs = () => {
               <tr key={blog._id} className="border-t">
                 <td className="py-3 px-4">{blog.title}</td>
                 <td className="py-3 px-4">
-                  {blog.isPublished ? ( // ✅ fixed field name
+                  {blog.isPublished ? (
                     <span className="text-green-600">Published</span>
                   ) : (
                     <span className="text-yellow-600">Draft</span>

@@ -51,12 +51,76 @@
 
 // export default UserComments;
 
+// import React, { useEffect, useState } from "react";
+// import axios from "axios";
+// import { useUser } from "@clerk/clerk-react";
+
+// const UserComments = () => {
+//   const { user, isSignedIn, getToken } = useUser();
+//   const [comments, setComments] = useState([]);
+//   const [loading, setLoading] = useState(true);
+
+//   useEffect(() => {
+//     const fetchComments = async () => {
+//       if (!isSignedIn || !user) {
+//         setLoading(false);
+//         return;
+//       }
+
+//       try {
+//         const token = await getToken();
+
+//        const res = await axios.get("/api/blog/my-comments", {   // ✅ fixed endpoint
+//   headers: { Authorization: `Bearer ${token}` },
+//   withCredentials: true,
+// });
+
+
+//         setComments(res.data.comments || []); // ✅ ensure we use comments key
+//       } catch (err) {
+//         console.error("Error fetching comments:", err);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchComments();
+//   }, [isSignedIn, user]);
+
+//   return (
+//     <div>
+//       <h2 className="text-2xl font-bold mb-6">Comments on My Blogs</h2>
+
+//       {loading ? (
+//         <p className="text-gray-500">Loading comments...</p>
+//       ) : comments.length === 0 ? (
+//         <p className="text-gray-500">No comments yet.</p>
+//       ) : (
+//         <div className="space-y-4">
+//           {comments.map((c) => (
+//             <div key={c._id} className="bg-white shadow rounded p-4">
+//               <p className="font-medium">{c.name}</p>
+//               <p className="text-gray-600">{c.content}</p>
+//               <p className="text-sm text-gray-400">
+//                 Blog: {c.blog?.title || "Deleted"}
+//               </p>
+//             </div>
+//           ))}
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default UserComments;
+
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useUser } from "@clerk/clerk-react";
+import { useUser, useAuth } from "@clerk/clerk-react";   // ✅ useAuth added
 
 const UserComments = () => {
-  const { user, isSignedIn, getToken } = useUser();
+  const { user, isSignedIn } = useUser();
+  const { getToken } = useAuth();   // ✅ fix
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -70,13 +134,12 @@ const UserComments = () => {
       try {
         const token = await getToken();
 
-       const res = await axios.get("/api/blog/my-comments", {   // ✅ fixed endpoint
-  headers: { Authorization: `Bearer ${token}` },
-  withCredentials: true,
-});
+        const res = await axios.get("/api/blog/my-comments", {   // ✅ correct endpoint
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
+        });
 
-
-        setComments(res.data.comments || []); // ✅ ensure we use comments key
+        setComments(res.data.comments || []);
       } catch (err) {
         console.error("Error fetching comments:", err);
       } finally {
@@ -90,7 +153,6 @@ const UserComments = () => {
   return (
     <div>
       <h2 className="text-2xl font-bold mb-6">Comments on My Blogs</h2>
-
       {loading ? (
         <p className="text-gray-500">Loading comments...</p>
       ) : comments.length === 0 ? (

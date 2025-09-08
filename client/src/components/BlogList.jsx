@@ -204,7 +204,7 @@ const BlogList = () => {
                 onClick={() => setShowMoreDropdown((prev) => !prev)}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="cursor-pointer text-gray-500 relative px-4 py-1 rounded-full whitespace-nowrap bg-gray-100 hover:bg-gray-200"
+                className="cursor-pointer text-gray-500 relative px-4 py-1 rounded-full  whitespace-nowrap bg-gray-100 hover:bg-gray-200"
               >
                 More
               </motion.button>
@@ -217,7 +217,7 @@ const BlogList = () => {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.25, ease: "easeOut" }}
-                    className="absolute top-full left-0 mt-2 bg-white border rounded-lg shadow-lg z-20"
+                    className="absolute top-full left-0 mt-2 bg-white border rounded-lg shadow-lg z-50"
                   >
                     {remainingCategories.map((item) => (
                       <button

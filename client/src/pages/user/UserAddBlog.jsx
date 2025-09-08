@@ -253,7 +253,7 @@ const UserAddBlog = ({ onBlogAdded }) => {
       formData.append("blog", JSON.stringify(blog));
       formData.append("image", image);
 
-      const { data } = await axios.post("/api/blog", formData, {
+      const { data } = await axios.post("/api/user/blog", formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

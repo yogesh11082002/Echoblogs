@@ -1,5 +1,7 @@
 import Blog from "../models/Blog.js";
 import Comment from "../models/Comment.js";
+import fs from "fs";
+import imagekit from "../configs/imageKit.js";
 
 // Get all blogs of the logged-in user
 export const getMyBlogs = async (req, res) => {
@@ -13,15 +15,38 @@ export const getMyBlogs = async (req, res) => {
 };
 
 // Create a blog for the logged-in user
+
 export const createBlog = async (req, res) => {
   try {
     const userId = req.userId;
     const { title, subTitle, description, category, isPublished } = JSON.parse(req.body.blog);
+    const imageFile = req.file;
 
-    if (!title || !description || !category) {
+    if (!title || !description || !category || !imageFile) {
       return res.json({ success: false, message: "All fields are required" });
     }
 
+    // read file buffer
+    const fileBuffer = fs.readFileSync(imageFile.path);
+
+    // upload to ImageKit
+    const uploadResponse = await imagekit.upload({
+      file: fileBuffer,
+      fileName: imageFile.originalname,
+      folder: "/blogs",
+    });
+
+    // optimize image
+    const optimizedImageUrl = imagekit.url({
+      path: uploadResponse.filePath,
+      transformation: [
+        { quality: "auto" },
+        { format: "webp" },
+        { width: "1280" },
+      ],
+    });
+
+    // save blog
     const blog = new Blog({
       title,
       subTitle,
@@ -29,15 +54,17 @@ export const createBlog = async (req, res) => {
       category,
       isPublished: isPublished || false,
       author: userId,
-      image: req.file ? req.file.path : null,
+      image: optimizedImageUrl,
     });
 
     await blog.save();
-    res.json({ success: true, message: "Blog created!", blog });
+
+    res.json({ success: true, message: "Blog created successfully!", blog });
   } catch (error) {
     res.json({ success: false, message: error.message });
   }
 };
+
 
 // Delete a blog of the logged-in user
 export const deleteBlog = async (req, res) => {
@@ -55,22 +82,7 @@ export const deleteBlog = async (req, res) => {
   }
 };
 
-// Get all comments on the user's blogs
-// export const getCommentsOnMyBlogs = async (req, res) => {
-//   try {
-//     const userId = req.userId;
-//     const userBlogs = await Blog.find({ author: userId }).select("_id");
 
-//     const blogIds = userBlogs.map(b => b._id);
-//     const comments = await Comment.find({ blog: { $in: blogIds } })
-//       .populate("blog", "title")
-//       .sort({ createdAt: -1 });
-
-//     res.json({ success: true, comments });
-//   } catch (error) {
-//     res.json({ success: false, message: error.message });
-//   }
-// };
 export const getCommentsOnMyBlogs = async (req, res) => {
   try {
     const userId = req.userId;
@@ -116,3 +128,28 @@ export const getUserDashboard = async (req, res) => {
     res.json({ success: false, message: error.message });
   }
 };
+
+// export const togglePublishBlog = async (req, res) => {
+//   try {
+//     const { id } = req.body;
+//     const blog = await Blog.findById(id);
+//     blog.isPublished = !blog.isPublished;
+//     await blog.save();
+//     res.json({ success: true, message: "Blog status updated" });
+//   } catch (error) {
+//     res.json({ success: false, message: error.message });
+//   }
+// };
+
+// export const addUserComment = async (req, res) => {
+//   try {
+//     const { blog,name,content } = req.body;
+//     await Comment.create({blog,name,content, 
+//      author: userId,
+//     });
+   
+//     res.json({ success: true, message: "Comment added for review" });
+//   } catch (error) {
+//     res.json({ success: false, message: error.message });
+//   }
+// };

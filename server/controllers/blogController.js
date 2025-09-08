@@ -22,7 +22,7 @@ export const addBlog = async (req, res) => {
       folder: "/blogs",
     });
 
-    // optimize image
+    // optimize image for better quality
 
     const optimizedImageUrl = imagekit.url({
       path: response.filePath,

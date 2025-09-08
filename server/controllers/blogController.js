@@ -98,37 +98,16 @@ export const togglePublish = async (req, res) => {
   }
 };
 
-// export const addComment = async (req, res) => {
-//   try {
-//     const { blog,name,content } = req.body;
-//     await Comment.create({blog,name,content});
-   
-//     res.json({ success: true, message: "Comment added for review" });
-//   } catch (error) {
-//     res.json({ success: false, message: error.message });
-//   }
-// };
 export const addComment = async (req, res) => {
   try {
-    const { blog, name, content } = req.body;
-
-    if (!req.user) {
-      return res.status(401).json({ success: false, message: "Not authenticated" });
-    }
-
-    const comment = await Comment.create({
-      blog,
-      name,
-      content,
-      authorId: req.user, // ✅ set the logged-in user ID
-    });
-
-    res.json({ success: true, message: "Comment added for review", comment });
+    const { blog,name,content } = req.body;
+    await Comment.create({blog,name,content});
+   
+    res.json({ success: true, message: "Comment added for review" });
   } catch (error) {
     res.json({ success: false, message: error.message });
   }
 };
-
 
 export const getBlogComments = async (req, res) => {
   try {
@@ -268,13 +247,16 @@ export const deleteBlog = async (req, res) => {
 
 
 // Get comments on blog authored by logged-in user
+
 export const getCommentsOnMyBlogs = async (req, res) => {
   try {
+    // req.user should be the logged-in user's ID
     const myBlogs = await Blog.find({ author: req.user }).select("_id");
     const blogIds = myBlogs.map((b) => b._id);
 
-    const comments = await Comment.find({ blog: { $in: blogIds } })
-      .populate("blog", "title")
+    // Get approved comments only
+    const comments = await Comment.find({ blog: { $in: blogIds }, isApproved: true })
+      .populate("blog", "title")  // include blog title
       .sort({ createdAt: -1 });
 
     res.json({ success: true, comments });
@@ -282,5 +264,6 @@ export const getCommentsOnMyBlogs = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
 
 

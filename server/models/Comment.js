@@ -18,7 +18,6 @@ import mongoose from "mongoose";
 
 const commentSchema = new mongoose.Schema({
   blog: { type: mongoose.Schema.Types.ObjectId, ref: "Blog", required: true },
-  authorId: { type: String, required: true }, // Clerk userId
   name: { type: String, required: true },     // Display name
   content: { type: String, required: true },
   isApproved: { type: Boolean, default: false }

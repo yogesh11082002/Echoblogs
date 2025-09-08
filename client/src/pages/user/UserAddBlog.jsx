@@ -143,9 +143,12 @@ Write a detailed blog on the topic: "${title}".
   };
 
   return (
-    <form ref={formRef} onSubmit={onSubmitHandler} className="flex-1 bg-blue-50/50 text-gray-600 h-full overflow-scroll p-4">
+    <form
+      ref={formRef}
+      onSubmit={onSubmitHandler}
+      className="flex-1 bg-blue-50/50 text-gray-600 h-full overflow-scroll p-4"
+    >
       <div className="bg-white w-full max-w-3xl p-6 md:p-10 sm:m-10 shadow rounded space-y-6">
-
         {/* Thumbnail */}
         <div>
           <p className="font-semibold mb-2">Upload thumbnail</p>
@@ -194,13 +197,20 @@ Write a detailed blog on the topic: "${title}".
         <div className="space-y-2 relative">
           <p className="font-semibold mb-1">Blog Description</p>
           <div className="max-w-lg h-80 pb-16 sm:pb-10 pt-2 relative border border-gray-300 rounded">
-            <ReactQuill value={content} onChange={setContent} theme="snow" className="h-full" />
+            <ReactQuill
+              value={content}
+              onChange={setContent}
+              theme="snow"
+              className="h-full"
+            />
 
             {/* AI loading overlay */}
             {isGenerating && (
               <div className="absolute inset-0 bg-black/30 flex flex-col items-center justify-center z-10 rounded animate-fadeIn">
                 <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin mb-4"></div>
-                <p className="text-white font-semibold text-sm animate-pulse">AI is writing your blog...</p>
+                <p className="text-white font-semibold text-sm animate-pulse">
+                  AI is writing your blog...
+                </p>
               </div>
             )}
 
@@ -230,6 +240,16 @@ Write a detailed blog on the topic: "${title}".
             <option value="Startup">Startup</option>
             <option value="Lifestyle">Lifestyle</option>
             <option value="Finance">Finance</option>
+            <option value="Health">Health</option>
+            <option value="Travel">Travel</option>
+            <option value="Education">Education</option>
+            <option value="Entertainment">Entertainment</option>
+            <option value="Science">Science</option>
+            <option value="Sports">Sports</option>
+            <option value="Food">Food</option>
+            <option value="Politics">Politics</option>
+            <option value="Art & Culture">Art & Culture</option>
+            <option value="Environment">Environment</option>
           </select>
         </div>
 

@@ -110,7 +110,7 @@ const UserComments = ({ refreshTrigger }) => {
         <div className="flex gap-4">
           <button
             onClick={() => setFilter("Approved")}
-            className={`shadow-custom-sm border rounded-full px-4 py-1 cursor-pointer text-xs ${
+            className={`shadow-custom-sm border rounded-full px-2 sm:px-4 py-1 cursor-pointer text-xs ${
               filter === "Approved" ? "text-primary" : "text-gray-700"
             }`}
           >

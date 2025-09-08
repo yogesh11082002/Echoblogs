@@ -172,38 +172,37 @@ Write a detailed blog on the topic: "${title}".
           </div>
         </div>
 
-       {/* Blog Description */}
-<div className="space-y-2 relative">
-  <p className="font-semibold mb-1">Blog Description</p>
-  <div className="max-w-lg h-80 pb-16 sm:pb-10 pt-2 relative border border-gray-300 rounded">
-    <ReactQuill
-      value={content}
-      onChange={setContent}
-      theme="snow"
-      className="h-full"
-    />
+        {/* Blog Description */}
+        <div className="space-y-2 relative">
+          <p className="font-semibold mb-1">Blog Description</p>
+          <div className="max-w-lg h-80 pb-16 sm:pb-10 pt-2 relative border border-gray-300 rounded">
+            <ReactQuill
+              value={content}
+              onChange={setContent}
+              theme="snow"
+              className="h-full"
+            />
 
-    {/* Fancy loading overlay */}
-    {isGenerating && (
-      <div className="absolute inset-0 bg-black/30 flex flex-col items-center justify-center z-10 rounded animate-fadeIn">
-        <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin mb-4"></div>
-        <p className="text-white font-semibold text-sm animate-pulse">
-          AI is writing your blog...
-        </p>
-      </div>
-    )}
+            {/* Fancy loading overlay */}
+            {isGenerating && (
+              <div className="absolute inset-0 bg-black/30 flex flex-col items-center justify-center z-10 rounded animate-fadeIn">
+                <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin mb-4"></div>
+                <p className="text-white font-semibold text-sm animate-pulse">
+                  AI is writing your blog...
+                </p>
+              </div>
+            )}
 
-    <button
-      type="button"
-      onClick={generateContent}
-      disabled={isGenerating}
-      className="absolute bottom-2 right-2 text-xs text-white bg-black/70 px-4 py-1.5 rounded hover:underline cursor-pointer"
-    >
-      {isGenerating ? "Generating..." : "Generate with AI"}
-    </button>
-  </div>
-</div>
-
+            <button
+              type="button"
+              onClick={generateContent}
+              disabled={isGenerating}
+              className="absolute bottom-2 right-2 text-xs text-white bg-black/70 px-4 py-1.5 rounded hover:underline cursor-pointer"
+            >
+              {isGenerating ? "Generating..." : "Generate with AI"}
+            </button>
+          </div>
+        </div>
 
         {/* Blog Category */}
         <div className="space-y-2 mt-12">
@@ -220,6 +219,16 @@ Write a detailed blog on the topic: "${title}".
             <option value="Startup">Startup</option>
             <option value="Lifestyle">Lifestyle</option>
             <option value="Finance">Finance</option>
+            <option value="Health">Health</option>
+            <option value="Travel">Travel</option>
+            <option value="Education">Education</option>
+            <option value="Entertainment">Entertainment</option>
+            <option value="Science">Science</option>
+            <option value="Sports">Sports</option>
+            <option value="Food">Food</option>
+            <option value="Politics">Politics</option>
+            <option value="Art & Culture">Art & Culture</option>
+            <option value="Environment">Environment</option>
           </select>
         </div>
 

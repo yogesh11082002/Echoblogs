@@ -294,7 +294,7 @@ const UserDashboard = () => {
         </div>
 
         <div className="flex items-center gap-4 bg-white p-4 min-w-[150px] rounded shadow cursor-pointer hover:scale-105 transition-all">
-          <img alt="" src={assets.dashboard_icon_2} />
+          <img alt="" src={assets.dashboard_icon_4} />
           <div>
             <p className="text-xl font-semibold text-gray-600">
               {dashboardData.publishedBlogs}
@@ -314,7 +314,7 @@ const UserDashboard = () => {
         </div>
 
         <div className="flex items-center gap-4 bg-white p-4 min-w-[150px] rounded shadow cursor-pointer hover:scale-105 transition-all">
-          <img alt="" src={assets.dashboard_icon_4} />
+          <img alt="" src={assets.dashboard_icon_2} />
           <div>
             <p className="text-xl font-semibold text-gray-600">
               {dashboardData.totalComments}

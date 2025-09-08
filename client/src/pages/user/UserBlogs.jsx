@@ -1,136 +1,32 @@
-// const UserBlogs = () => {
-//   return (
-//     <div className="p-6">
-//       <h1 className="text-2xl font-semibold mb-4">My Blogs</h1>
-//       <p className="text-gray-600">
-//         Here you can view and manage your own blogs.
-//       </p>
-//       {/* TODO: Fetch only blogs by logged-in user */}
-//     </div>
-//   );
-// };
-
-// export default UserBlogs;
-
 // import React, { useEffect, useState } from "react";
 // import axios from "axios";
-// import { useUser } from "@clerk/clerk-react";
+// import { useUser, useAuth } from "@clerk/clerk-react";
 // import { Pencil, Trash2 } from "lucide-react";
+// import { toast } from "react-hot-toast";
 
-// const UserBlogs = () => {
-//   const { user, isSignedIn, getToken } = useUser();
-//   const [blogs, setBlogs] = useState([]);
-
-//   const fetchBlogs = async () => {
-//     if (!isSignedIn || !user) return;
-
-//     try {
-//       const token = await getToken({ template: "default" });
-
-//       const res = await axios.get("/api/blog/my-blogs", {
-//         headers: { Authorization: token },
-//       });
-
-//       setBlogs(res.data || []);
-//     } catch (err) {
-//       console.error("Error fetching user blogs:", err);
-//     }
-//   };
-
-//   const deleteBlog = async (id) => {
-//     try {
-//       const token = await getToken({ template: "default" });
-
-//       await axios.delete(`/api/blog/${id}`, {
-//         headers: { Authorization: token },
-//       });
-
-//       setBlogs(blogs.filter((b) => b._id !== id));
-//     } catch (err) {
-//       console.error("Error deleting blog:", err);
-//     }
-//   };
-
-//   useEffect(() => {
-//     fetchBlogs();
-//   }, [isSignedIn, user, getToken]);
-
-//   return (
-//     <div>
-//       <h2 className="text-2xl font-bold mb-6">My Blogs</h2>
-
-//       {blogs.length === 0 ? (
-//         <p className="text-gray-500">You haven’t created any blogs yet.</p>
-//       ) : (
-//         <table className="w-full bg-white shadow rounded overflow-hidden">
-//           <thead className="bg-gray-100">
-//             <tr>
-//               <th className="text-left py-3 px-4">Title</th>
-//               <th className="text-left py-3 px-4">Status</th>
-//               <th className="text-left py-3 px-4">Actions</th>
-//             </tr>
-//           </thead>
-//           <tbody>
-//             {blogs.map((blog) => (
-//               <tr key={blog._id} className="border-t">
-//                 <td className="py-3 px-4">{blog.title}</td>
-//                 <td className="py-3 px-4">
-//                   {blog.published ? (
-//                     <span className="text-green-600">Published</span>
-//                   ) : (
-//                     <span className="text-yellow-600">Draft</span>
-//                   )}
-//                 </td>
-//                 <td className="py-3 px-4 flex gap-3">
-//                   <button className="text-blue-600 hover:underline flex items-center gap-1">
-//                     <Pencil size={16} /> Edit
-//                   </button>
-//                   <button
-//                     onClick={() => deleteBlog(blog._id)}
-//                     className="text-red-600 hover:underline flex items-center gap-1"
-//                   >
-//                     <Trash2 size={16} /> Delete
-//                   </button>
-//                 </td>
-//               </tr>
-//             ))}
-//           </tbody>
-//         </table>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default UserBlogs;
-
-// import React, { useEffect, useState } from "react";
-// import axios from "axios";
-// import { useUser } from "@clerk/clerk-react";
-// import { Pencil, Trash2 } from "lucide-react";
-
-// const UserBlogs = () => {
-//   const { user, isSignedIn, getToken } = useUser();
+// const UserBlogs = ({ refreshTrigger }) => {
+//   const { isSignedIn } = useUser();
+//   const { getToken } = useAuth();
 //   const [blogs, setBlogs] = useState([]);
 //   const [loading, setLoading] = useState(true);
 
 //   const fetchBlogs = async () => {
-//     if (!isSignedIn || !user) {
+//     if (!isSignedIn) {
 //       setLoading(false);
 //       return;
 //     }
 
 //     try {
 //       const token = await getToken();
+//       const res = await axios.get("/api/user/blog/my-blogs", {
+//         headers: { Authorization: `Bearer ${token}` },
+//       });
 
-//      const res = await axios.get("/api/blog/my-blogs", {
-//   headers: { Authorization: `Bearer ${token}` },
-//   withCredentials: true,
-// });
-
-
-//       setBlogs(res.data.blogs || []); // ✅ use blogs key
+//       if (res.data.success) setBlogs(res.data.blogs);
+//       else toast.error(res.data.message || "Failed to fetch blogs");
 //     } catch (err) {
-//       console.error("Error fetching user blogs:", err);
+//       console.error(err);
+//       toast.error("Failed to fetch blogs");
 //     } finally {
 //       setLoading(false);
 //     }
@@ -139,115 +35,86 @@
 //   const deleteBlog = async (id) => {
 //     try {
 //       const token = await getToken();
-
-//       await axios.delete(`/api/blog/${id}`, {
+//       await axios.delete(`/api/user/blog/${id}`, {
 //         headers: { Authorization: `Bearer ${token}` },
 //       });
-
-//       setBlogs((prev) => prev.filter((b) => b._id !== id));
+//       toast.success("Blog deleted");
+//       fetchBlogs();
 //     } catch (err) {
-//       console.error("Error deleting blog:", err);
+//       console.error(err);
+//       toast.error("Failed to delete blog");
 //     }
 //   };
 
 //   useEffect(() => {
 //     fetchBlogs();
-//   }, [isSignedIn, user]);
+//   }, [refreshTrigger, isSignedIn]);
+
+//   if (loading) return <p>Loading blogs...</p>;
+//   if (!blogs.length) return <p>No blogs yet.</p>;
 
 //   return (
-//     <div>
-//       <h2 className="text-2xl font-bold mb-6">My Blogs</h2>
-
-//       {loading ? (
-//         <p className="text-gray-500">Loading blogs...</p>
-//       ) : blogs.length === 0 ? (
-//         <p className="text-gray-500">You haven’t created any blogs yet.</p>
-//       ) : (
-//         <table className="w-full bg-white shadow rounded overflow-hidden">
-//           <thead className="bg-gray-100">
-//             <tr>
-//               <th className="text-left py-3 px-4">Title</th>
-//               <th className="text-left py-3 px-4">Status</th>
-//               <th className="text-left py-3 px-4">Actions</th>
-//             </tr>
-//           </thead>
-//           <tbody>
-//             {blogs.map((blog) => (
-//               <tr key={blog._id} className="border-t">
-//                 <td className="py-3 px-4">{blog.title}</td>
-//                 <td className="py-3 px-4">
-//                   {blog.isPublished ? ( // ✅ fixed field name
-//                     <span className="text-green-600">Published</span>
-//                   ) : (
-//                     <span className="text-yellow-600">Draft</span>
-//                   )}
-//                 </td>
-//                 <td className="py-3 px-4 flex gap-3">
-//                   <button className="text-blue-600 hover:underline flex items-center gap-1">
-//                     <Pencil size={16} /> Edit
-//                   </button>
-//                   <button
-//                     onClick={() => deleteBlog(blog._id)}
-//                     className="text-red-600 hover:underline flex items-center gap-1"
-//                   >
-//                     <Trash2 size={16} /> Delete
-//                   </button>
-//                 </td>
-//               </tr>
-//             ))}
-//           </tbody>
-//         </table>
-//       )}
-//     </div>
+//     <table className="w-full border rounded">
+//       <thead className="bg-gray-100">
+//         <tr>
+//           <th className="p-2 text-left">Title</th>
+//           <th className="p-2 text-left">Status</th>
+//           <th className="p-2 text-left">Actions</th>
+//         </tr>
+//       </thead>
+//       <tbody>
+//         {blogs.map((b) => (
+//           <tr key={b._id} className="border-t">
+//             <td className="p-2">{b.title}</td>
+//             <td className="p-2">{b.isPublished ? "Published" : "Draft"}</td>
+//             <td className="p-2 flex gap-2">
+//               <button className="text-blue-600 flex items-center gap-1">
+//                 <Pencil size={16} /> Edit
+//               </button>
+//               <button
+//                 onClick={() => deleteBlog(b._id)}
+//                 className="text-red-600 flex items-center gap-1"
+//               >
+//                 <Trash2 size={16} /> Delete
+//               </button>
+//             </td>
+//           </tr>
+//         ))}
+//       </tbody>
+//     </table>
 //   );
 // };
 
 // export default UserBlogs;
+
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useUser, useAuth } from "@clerk/clerk-react";
-import { Pencil, Trash2 } from "lucide-react";
 import { toast } from "react-hot-toast";
+import UserBlogTable from "./UserBlogTable"; // ✅ Row component (like BlogTableItem)
 
 const UserBlogs = ({ refreshTrigger }) => {
   const { isSignedIn } = useUser();
   const { getToken } = useAuth();
   const [blogs, setBlogs] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   const fetchBlogs = async () => {
-    if (!isSignedIn) {
-      setLoading(false);
-      return;
-    }
+    if (!isSignedIn) return;
 
     try {
       const token = await getToken();
-      const res = await axios.get("/api/user/blog/my-blogs", {
+      const res = await fetch("/api/user/blog/my-blogs", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      if (res.data.success) setBlogs(res.data.blogs);
-      else toast.error(res.data.message || "Failed to fetch blogs");
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setBlogs(data.blogs);
+      } else {
+        toast.error(data.message || "Failed to fetch blogs");
+      }
     } catch (err) {
       console.error(err);
       toast.error("Failed to fetch blogs");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const deleteBlog = async (id) => {
-    try {
-      const token = await getToken();
-      await axios.delete(`/api/user/blog/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      toast.success("Blog deleted");
-      fetchBlogs();
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to delete blog");
     }
   };
 
@@ -255,40 +122,43 @@ const UserBlogs = ({ refreshTrigger }) => {
     fetchBlogs();
   }, [refreshTrigger, isSignedIn]);
 
-  if (loading) return <p>Loading blogs...</p>;
-  if (!blogs.length) return <p>No blogs yet.</p>;
-
   return (
-    <table className="w-full border rounded">
-      <thead className="bg-gray-100">
-        <tr>
-          <th className="p-2 text-left">Title</th>
-          <th className="p-2 text-left">Status</th>
-          <th className="p-2 text-left">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {blogs.map((b) => (
-          <tr key={b._id} className="border-t">
-            <td className="p-2">{b.title}</td>
-            <td className="p-2">{b.isPublished ? "Published" : "Draft"}</td>
-            <td className="p-2 flex gap-2">
-              <button className="text-blue-600 flex items-center gap-1">
-                <Pencil size={16} /> Edit
-              </button>
-              <button
-                onClick={() => deleteBlog(b._id)}
-                className="text-red-600 flex items-center gap-1"
-              >
-                <Trash2 size={16} /> Delete
-              </button>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+    <div className="flex-1 pt-5 px-5 sm:pt-12 sm:pl-16 bg-blue-50/50">
+      <h1 className="text-primary text-2xl">My Blogs</h1>
+
+      <div className="relative h-4/5 mt-4 max-w-4xl overflow-x-auto shadow rounded-lg scrollbar-hide bg-white">
+        <table className="w-full text-sm text-gray-500">
+          <thead className="text-xs text-gray-600 text-left uppercase">
+            <tr>
+              <th scope="col" className="px-2 py-4 xl:px-6">#</th>
+              <th scope="col" className="px-2 py-4">Blog Title</th>
+              <th scope="col" className="px-2 py-4 max-sm:hidden">Date</th>
+              <th scope="col" className="px-2 py-4 max-sm:hidden">Status</th>
+              <th scope="col" className="px-2 py-4">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {blogs.length > 0 ? (
+              blogs.map((blog, index) => (
+                <UserBlogTable
+                  key={blog._id}
+                  blog={blog}
+                  fetchBlogs={fetchBlogs}
+                  index={index + 1}
+                />
+              ))
+            ) : (
+              <tr>
+                <td colSpan="5" className="text-center py-6 text-gray-500">
+                  No blogs yet.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 };
 
 export default UserBlogs;
-

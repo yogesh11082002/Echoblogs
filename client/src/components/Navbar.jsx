@@ -144,7 +144,7 @@ const Navbar = () => {
         onClick={() => navigate("/")} // ✅ Always go home
         src={assets.mylogo}
         alt="logo"
-        className="w-32 sm:w-40 cursor-pointer"
+        className="w-36 sm:w-40 cursor-pointer"
         whileHover={{ scale: 1.05 }}
         transition={{ type: "spring", stiffness: 200 }}
       />

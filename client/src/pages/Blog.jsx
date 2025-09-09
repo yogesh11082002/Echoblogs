@@ -54,6 +54,10 @@
 //       fetchComments();
 //     }
 //   }, [id]);
+//   // ✅ Scroll to top when blog id changes
+// useEffect(() => {
+//   window.scrollTo({ top: 0, behavior: "smooth" });
+// }, [id]);
 
 //   // ✅ Animate description
 //   useEffect(() => {
@@ -346,9 +350,9 @@ const Blog = () => {
     }
   }, [id]);
   // ✅ Scroll to top when blog id changes
-useEffect(() => {
-  window.scrollTo({ top: 0, behavior: "smooth" });
-}, [id]);
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [id]);
 
   // ✅ Animate description
   useEffect(() => {
@@ -553,27 +557,58 @@ useEffect(() => {
             Share this article on social media
           </p>
           <div className="flex justify-center gap-6">
-            <motion.img
-              src={assets.facebook_icon}
-              width="40"
-              alt="Facebook"
-              className="cursor-pointer"
-              whileHover={{ scale: 1.2, rotate: 5 }}
-            />
-            <motion.img
-              src={assets.twitter_icon}
-              width="40"
-              alt="Twitter"
-              className="cursor-pointer"
-              whileHover={{ scale: 1.2, rotate: -5 }}
-            />
-            <motion.img
-              src={assets.googleplus_icon}
-              width="40"
-              alt="Google"
-              className="cursor-pointer"
-              whileHover={{ scale: 1.2, rotate: 5 }}
-            />
+            {/* Facebook */}
+            <a
+              href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+                window.location.href
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <motion.img
+                src={assets.facebook_icon}
+                width="40"
+                alt="Facebook"
+                className="cursor-pointer"
+                whileHover={{ scale: 1.2, rotate: 5 }}
+              />
+            </a>
+
+            {/* Twitter (X) */}
+            <a
+              href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(
+                window.location.href
+              )}&text=${encodeURIComponent(blog?.title || "Check this out!")}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <motion.img
+                src={assets.twitter_icon}
+                width="40"
+                alt="Twitter"
+                className="cursor-pointer"
+                whileHover={{ scale: 1.2, rotate: -5 }}
+              />
+            </a>
+
+            {/* Gmail Share */}
+            <a
+              href={`mailto:?subject=${encodeURIComponent(
+                blog?.title || "Interesting Blog"
+              )}&body=${encodeURIComponent(
+                `Check out this blog: ${window.location.href}`
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <motion.img
+                src={assets.googleplus_icon}
+                width="40"
+                alt="Email"
+                className="cursor-pointer"
+                whileHover={{ scale: 1.2, rotate: 5 }}
+              />
+            </a>
           </div>
         </motion.div>
       </div>

@@ -21,6 +21,7 @@
 //   }
 // };
 // middleware/userAuth.js
+
 import { verifyToken } from "@clerk/clerk-sdk-node";
 
 export const userAuth = async (req, res, next) => {
